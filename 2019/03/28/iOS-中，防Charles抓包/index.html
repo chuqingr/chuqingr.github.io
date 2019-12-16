@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/head.jpg?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="App 安全越来越受重视，要分析一个App ，抓包是必不可少的，那么如何防止想Charles 之类（中间人攻击类型）的抓包软件的抓包那？主要有以下几个思路：  1.检测是否使用了代理，检测到使用了代理就关闭网络请求。 2.不管你是否使用了代理，我发起的网络请求，不走你的代理。照样发送。 3.使用自签名证书的应用和双向验证的应用。 4.通过 HTTP/1.1 及以上版本的 CONNECT 请求方式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS 中，防Charles抓包">
+<meta property="og:url" content="https://www.chuqingr.cn/2019/03/28/iOS-中，防Charles抓包/index.html">
+<meta property="og:site_name" content="Yshao的个人博客">
+<meta property="og:description" content="App 安全越来越受重视，要分析一个App ，抓包是必不可少的，那么如何防止想Charles 之类（中间人攻击类型）的抓包软件的抓包那？主要有以下几个思路：  1.检测是否使用了代理，检测到使用了代理就关闭网络请求。 2.不管你是否使用了代理，我发起的网络请求，不走你的代理。照样发送。 3.使用自签名证书的应用和双向验证的应用。 4.通过 HTTP/1.1 及以上版本的 CONNECT 请求方式">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-03-28T10:08:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS 中，防Charles抓包">
+<meta name="twitter:description" content="App 安全越来越受重视，要分析一个App ，抓包是必不可少的，那么如何防止想Charles 之类（中间人攻击类型）的抓包软件的抓包那？主要有以下几个思路：  1.检测是否使用了代理，检测到使用了代理就关闭网络请求。 2.不管你是否使用了代理，我发起的网络请求，不走你的代理。照样发送。 3.使用自签名证书的应用和双向验证的应用。 4.通过 HTTP/1.1 及以上版本的 CONNECT 请求方式">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.chuqingr.cn/2019/03/28/iOS-中，防Charles抓包/"/>
+
+
+
+
+
+  <title>iOS 中，防Charles抓包 | Yshao的个人博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+    <a href="https://github.com/chuqingr" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#64CEAA; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yshao的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">学海无涯苦作舟</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.chuqingr.cn/2019/03/28/iOS-中，防Charles抓包/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yshao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yshao的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS 中，防Charles抓包</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-28T14:53:17+08:00">
+                2019-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/03/28/iOS-中，防Charles抓包/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/03/28/iOS-中，防Charles抓包/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>App 安全越来越受重视，要分析一个App ，抓包是必不可少的，那么如何防止想Charles 之类（中间人攻击类型）的抓包软件的抓包那？主要有以下几个思路：</p>
+<blockquote>
+<p>1.检测是否使用了代理，检测到使用了代理就关闭网络请求。</p>
+<p>2.不管你是否使用了代理，我发起的网络请求，不走你的代理。照样发送。</p>
+<p>3.使用自签名证书的应用和双向验证的应用。</p>
+<p>4.通过 HTTP/1.1 及以上版本的 CONNECT 请求方式</p>
+<p>5.对返回的数据进行加密(RSA | token | AES128 等等)</p>
+</blockquote>
+<a id="more"></a>
+<h4 id="1-检测是否使用了代理，检测到使用了代理就关闭网络请求。"><a href="#1-检测是否使用了代理，检测到使用了代理就关闭网络请求。" class="headerlink" title="1.检测是否使用了代理，检测到使用了代理就关闭网络请求。"></a>1.检测是否使用了代理，检测到使用了代理就关闭网络请求。</h4><p>当进行网络请求的时候,客户端判断当前是否设置了代理,如果设置了代理,不允许进行访问</p>
+<p>以下是是否设置了代理的代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">+ (BOOL)getProxyStatus &#123;</span><br><span class="line">    NSDictionary *proxySettings = NSMakeCollectable([(NSDictionary *)CFNetworkCopySystemProxySettings() autorelease]);</span><br><span class="line">    NSArray *proxies = NSMakeCollectable([(NSArray *)CFNetworkCopyProxiesForURL((CFURLRef)[NSURL URLWithString:@&quot;http://www.google.com&quot;], (CFDictionaryRef)proxySettings) autorelease]);</span><br><span class="line">    NSDictionary *settings = [proxies objectAtIndex:0];</span><br><span class="line">    </span><br><span class="line">    NSLog(@&quot;host=%@&quot;, [settings objectForKey:(NSString *)kCFProxyHostNameKey]);</span><br><span class="line">    NSLog(@&quot;port=%@&quot;, [settings objectForKey:(NSString *)kCFProxyPortNumberKey]);</span><br><span class="line">    NSLog(@&quot;type=%@&quot;, [settings objectForKey:(NSString *)kCFProxyTypeKey]);</span><br><span class="line">    </span><br><span class="line">    if ([[settings objectForKey:(NSString *)kCFProxyTypeKey] isEqualToString:@&quot;kCFProxyTypeNone&quot;]) &#123;</span><br><span class="line">        //没有设置代理</span><br><span class="line">        return NO;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        //设置代理了</span><br><span class="line">        return YES;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如何判断结果是设置了代理，可以在 NSURLProtocol 拦截请求。</p>
+<h4 id="2-不管你是否使用了代理，我发起的网络请求，不走你的代理。照样发送。"><a href="#2-不管你是否使用了代理，我发起的网络请求，不走你的代理。照样发送。" class="headerlink" title="2.不管你是否使用了代理，我发起的网络请求，不走你的代理。照样发送。"></a>2.不管你是否使用了代理，我发起的网络请求，不走你的代理。照样发送。</h4><p>现在iOS 上的网络请求基本分为三类，</p>
+<blockquote>
+<p>1.NSURLSession</p>
+<p>2.NSURLConnection</p>
+<p>3.CFNetWork</p>
+</blockquote>
+<p>第一种跟第二种比较常见，其中 NSURLSession 为iOS7 之后新添加，用于取代 NSURLConnection ，第三种是iOS 中，较低层，但是很高效的网路请求框架，NSURLSession就是基于CFNetWork 的封装。<br>这种不走代理，照样发起网络请求的方式，其实是CF 带的一种方式，NSURLSession也可以用这种方式进行网络请求，而NSURLConnection 暂未发现这种方式.</p>
+<h5 id="实现："><a href="#实现：" class="headerlink" title="实现："></a>实现：</h5><blockquote>
+<p>CFNetWork，因为iOS9以后 已经启用了发送http 请求的方法，所以不多做介绍，CFWriteStreamSetProperty 主要是对这个方法设置。</p>
+</blockquote>
+<p> NSURLSession有三种实例化方法：</p>
+<ul>
+<li>1.[NSURLSession sharedSession]</li>
+<li>2.+ (NSURLSession <em>)sessionWithConfiguration:(NSURLSessionConfiguration </em>)configuration;</li>
+<li>3.+ (NSURLSession <em>)sessionWithConfiguration:(NSURLSessionConfiguration </em>)configuration delegate:(nullable id <nsurlsessiondelegate>)delegate delegateQueue:(nullable NSOperationQueue *)queue;</nsurlsessiondelegate></li>
+</ul>
+<p>第一种是一种默认配置的全局session,第二种和第三者都需要传入一个 configuration 来配置生成session。<br>NSURLSessionConfiguration 有一个属性是 connectionProxyDictionary，官方给的注释是:<br>/<em> The proxy dictionary, as described by &lt;CFNetwork/CFHTTPStream.h&gt; </em>/ 设置代理的一个字典属性 CFNetwork/CFHTTPStream，中有这方面的描述，一般这个属性用来配置一些 需要走特定代理的连接，配置上特定的ip 端口之类的，但是如果在初始化 NSURLSession 的时候将 connectionProxyDictionary设置为空。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">configuration.connectionProxyDictionary = @&#123;&#125;;</span><br></pre></td></tr></table></figure>
+<p>那么，当手机开启了代理服务（如：Charles ，thor）的时候，用这个session发起的网络请求并不会去走这个代理，而且默认的不走代理直接发起网络请求。</p>
+<h4 id="3-使用自签名证书的应用和双向验证的应用。"><a href="#3-使用自签名证书的应用和双向验证的应用。" class="headerlink" title="3.使用自签名证书的应用和双向验证的应用。"></a>3.使用自签名证书的应用和双向验证的应用。</h4><p>这种方式是比较保险的防抓包的方式，具体实现参考：<br><a href="https://www.jianshu.com/p/0a6aa3922cf5" target="_blank" rel="noopener">https://www.jianshu.com/p/0a6aa3922cf5</a></p>
+<h4 id="4-通过-HTTP-1-1-及以上版本的-CONNECT-请求方式"><a href="#4-通过-HTTP-1-1-及以上版本的-CONNECT-请求方式" class="headerlink" title="4.通过 HTTP/1.1 及以上版本的 CONNECT 请求方式"></a>4.通过 HTTP/1.1 及以上版本的 CONNECT 请求方式</h4><blockquote>
+<p>什么是CONNECT 请求？</p>
+</blockquote>
+<p>平时工作中，GET 跟 POST 是我们用的比较多的请求方式，而CONNECT 是在 HTTP/1.1 协议中，HTTP/1.0 定义了三种请求方法： GET, POST 和 HEAD方法，HTTP/1.1 新增了五种请求方法：OPTIONS、 PUT、DELETE、 TRACE 和 CONNECT 方法。它主要是把服务器作为跳板，先验证用户名和密码等信息，再让服务器代替用户去访问其它网页，之后把数据返回给用户。对HTTP/1.1 的 CONNECT 有兴趣，可以查阅 HTTP代理协议 HTTP/1.1 的 CONNECT 方法。<br>而 之所以说采用CONNECT 请求当跳板，可以防止Charles抓包，是因为 Charles 抓CONNECT 的请求，回事unknown，所以就能达到防抓包的目的了。</p>
+<h4 id="5-对返回的数据进行加密-RSA-token-AES128-等等"><a href="#5-对返回的数据进行加密-RSA-token-AES128-等等" class="headerlink" title="5.对返回的数据进行加密(RSA | token | AES128 等等)"></a>5.对返回的数据进行加密(RSA | token | AES128 等等)</h4><p>这种方式严格的不是说让Charles 抓不到包，而是让抓到的包别人看不懂，采用密文传输。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>以上几种方式，虽然能一定程度上的增加App 的安全性，但是很有限，因为1，2 种方法都能通过动态调试hook掉对应的方法来实现抓包，相对而言，第3，4，5种方式比较安全，但是开发成本也相较于1，2种要大。</p>
+
+      
+    </div>
+    
+    
+    
+    <div>
+  
+    <div>
+
+    <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+  
+    </div>
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/09/如何正确的-hook-AppDelegate-中的方法/" rel="next" title="如何正确的 hook AppDelegate 中的方法">
+                <i class="fa fa-chevron-left"></i> 如何正确的 hook AppDelegate 中的方法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/04/iOS-命令速查表/" rel="prev" title="iOS 命令速查表">
+                iOS 命令速查表 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2019/03/28/iOS-中，防Charles抓包/"
+           data-title="iOS 中，防Charles抓包" data-url="https://www.chuqingr.cn/2019/03/28/iOS-中，防Charles抓包/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Yshao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/chuqingr" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-检测是否使用了代理，检测到使用了代理就关闭网络请求。"><span class="nav-number">1.</span> <span class="nav-text">1.检测是否使用了代理，检测到使用了代理就关闭网络请求。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-不管你是否使用了代理，我发起的网络请求，不走你的代理。照样发送。"><span class="nav-number">2.</span> <span class="nav-text">2.不管你是否使用了代理，我发起的网络请求，不走你的代理。照样发送。</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#实现："><span class="nav-number">2.1.</span> <span class="nav-text">实现：</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-使用自签名证书的应用和双向验证的应用。"><span class="nav-number">3.</span> <span class="nav-text">3.使用自签名证书的应用和双向验证的应用。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-通过-HTTP-1-1-及以上版本的-CONNECT-请求方式"><span class="nav-number">4.</span> <span class="nav-text">4.通过 HTTP/1.1 及以上版本的 CONNECT 请求方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-对返回的数据进行加密-RSA-token-AES128-等等"><span class="nav-number">5.</span> <span class="nav-text">5.对返回的数据进行加密(RSA | token | AES128 等等)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number"></span> <span class="nav-text">总结</span></a></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yshao</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

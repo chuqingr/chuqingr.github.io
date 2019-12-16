@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/head.jpg?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="swift," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="接上一篇，MVVM 模式中，ViewModel 的代码规范以及设计方式的探究 ViewModel 要具有哪些特性？">
+<meta name="keywords" content="swift">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MVVM &amp; RxSwift 中 VM 设计方式的探究">
+<meta property="og:url" content="https://www.chuqingr.cn/2018/08/30/MVVM-rxSwift中VM设计方式的探究/index.html">
+<meta property="og:site_name" content="Yshao的个人博客">
+<meta property="og:description" content="接上一篇，MVVM 模式中，ViewModel 的代码规范以及设计方式的探究 ViewModel 要具有哪些特性？">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1475472-539ab72188aaabd0.png">
+<meta property="og:updated_time" content="2018-09-07T09:36:31.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MVVM &amp; RxSwift 中 VM 设计方式的探究">
+<meta name="twitter:description" content="接上一篇，MVVM 模式中，ViewModel 的代码规范以及设计方式的探究 ViewModel 要具有哪些特性？">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/1475472-539ab72188aaabd0.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.chuqingr.cn/2018/08/30/MVVM-rxSwift中VM设计方式的探究/"/>
+
+
+
+
+
+  <title>MVVM & RxSwift 中 VM 设计方式的探究 | Yshao的个人博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+    <a href="https://github.com/chuqingr" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#64CEAA; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yshao的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">学海无涯苦作舟</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.chuqingr.cn/2018/08/30/MVVM-rxSwift中VM设计方式的探究/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yshao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yshao的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MVVM & RxSwift 中 VM 设计方式的探究</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-30T17:10:27+08:00">
+                2018-08-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/08/30/MVVM-rxSwift中VM设计方式的探究/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/08/30/MVVM-rxSwift中VM设计方式的探究/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><b>接上一篇，MVVM 模式中，ViewModel 的代码规范以及设计方式的探究</b></p>
+<h2 id="ViewModel-要具有哪些特性？"><a href="#ViewModel-要具有哪些特性？" class="headerlink" title="ViewModel 要具有哪些特性？"></a>ViewModel 要具有哪些特性？</h2><a id="more"></a>
+<p>ViewModel 的代码规范应该是为设计模式服务的。基于 MVVM 设计模式，ViewModel 的代码规范应该具有以下几点:</p>
+<ul>
+<li>1.ViewModel 应该是可以插入到任何View上的。我们不是先有了一个 View 在去定义一个 ViewModel。</li>
+<li>2.ViewModel 应该是可测的。MVVM 架构最大的好处是让业务逻辑可测。</li>
+<li>3.MVVM 使用绑定机制，所以我们使用RxSwift  </li>
+</ul>
+<blockquote>
+<p>根据理解，当设计一个 ViewModel 的时候，应该把 ViewModel 当做一个黑盒，接收输入，产生输出。</p>
+</blockquote>
+<center><br><img src="https://upload-images.jianshu.io/upload_images/1475472-539ab72188aaabd0.png" width="50%" height="200"><br><br>ViewModel<br></center>
+
+
+<p>对于RxSwift，意味着 Viewmodel 接收某些信号(流)(来自 View) 然后产生一些输出的信号(流)。</p>
+<p>根绝swift面向协议的特性，可以简单的定义一个协议:</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">protocol</span> <span class="title">ViewModelProtocol</span> </span>&#123;</span><br><span class="line"> 	associatedtype <span class="type">Input</span></span><br><span class="line"> 	associatedtype <span class="type">Output</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>associatedtype 关联类型，为协议提供占位符(类似OC中的别名)，当协议被采纳(遵守)的时候才会被指定。对应的在采纳协议的类中使用 typealias 来定义。</p>
+</blockquote>
+<p>根据思路，采用以上协议，会出现两种不同的实现方式。当然两种方式各有利弊，没有明确的优劣之分。这里只做探究</p>
+<h3 id="1-不使用Subject"><a href="#1-不使用Subject" class="headerlink" title="1.不使用Subject"></a>1.不使用Subject</h3><blockquote>
+<p>这种方式是 RxSwift 的作者所使用的，RxSwift 的 Demo 中使用的也是这种方式。这种方式就是给定一个输入，得到一个输出。所以我们只要在协议中增加一个转换方法，给定输入和输出就可以了,如下:</p>
+</blockquote>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">protocol</span> <span class="title">ViewModelProtocol</span> </span>&#123;</span><br><span class="line"> 	associatedtype <span class="type">Input</span></span><br><span class="line"> 	associatedtype <span class="type">Output</span></span><br><span class="line"> 	</span><br><span class="line"> 	<span class="function"><span class="keyword">func</span> <span class="title">trandform</span><span class="params">(input: Input)</span></span> -&gt; <span class="type">Output</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>场景假设:</p>
+<blockquote>
+<p>用户输入名字，再点击按钮，屏幕上显示Hello xxx.</p>
+</blockquote>
+<p>这是一个非常简单且典型的交互，ViewModel的实现如下:</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HelloViewModel</span>: <span class="title">ViewModelProtocol</span> </span>&#123;</span><br><span class="line">	</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">Input</span> </span>&#123;</span><br><span class="line">		<span class="keyword">let</span> name: <span class="type">Observable</span>&lt;<span class="type">String</span>&gt;</span><br><span class="line">		<span class="keyword">let</span> validate: <span class="type">Observable</span>&lt;<span class="type">Void</span>&gt;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">Output</span> </span>&#123;</span><br><span class="line">		<span class="keyword">let</span> greeting: <span class="type">Driver</span>&lt;<span class="type">String</span>&gt;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">func</span> <span class="title">transform</span><span class="params">(input: Input)</span></span> -&gt; <span class="type">Output</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> greeting = input.validate</span><br><span class="line">      .withLatestFrom(input.name)</span><br><span class="line">      .<span class="built_in">map</span> &#123; name <span class="keyword">in</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"Hello \(name)!"</span></span><br><span class="line">      &#125;</span><br><span class="line">      .startWith(<span class="string">""</span>)</span><br><span class="line">      .asDriver(onErrorJustReturn: <span class="string">":-("</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="type">Output</span>(greeting: greeting)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>transform 接受输入 input 得到输出 output ，这是一个满足我们预期的ViewModel。输出的结果是 “Hello (name)”,接下来来实现以下ViewController:</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HelloViewController</span>: <span class="title">UIViewController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> nameTextField: <span class="type">UITextField</span>!</span><br><span class="line">  <span class="keyword">var</span> validateButton: <span class="type">UIButton</span>!</span><br><span class="line">  <span class="keyword">var</span> greetingLabel: <span class="type">UILabel</span>!</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">let</span> viewModel = <span class="type">HelloViewModel</span>()</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">let</span> bag = <span class="type">DisposeBag</span>()</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">viewDidLoad</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.viewDidLoad()</span><br><span class="line">    initUI()</span><br><span class="line">    bindViewModel()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">extension</span> <span class="title">HelloViewController</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="function"><span class="keyword">func</span> <span class="title">bindViewModel</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">let</span> inputs = <span class="type">HelloViewModel</span>.<span class="type">Input</span>(name: nameTextField.rx.text.orEmpty.asObservable(),</span><br><span class="line">                                         validate: validateButton.rx.tap.asObservable())</span><br><span class="line">    <span class="keyword">let</span> outputs = viewModel.transform(input: inputs)</span><br><span class="line">    outputs.greeting</span><br><span class="line">      .drive(greetingLabel.rx.text)</span><br><span class="line">      .disposed(by: bag)</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">private</span> <span class="function"><span class="keyword">func</span> <span class="title">initUI</span><span class="params">()</span></span> &#123;</span><br><span class="line">  	<span class="comment">/// ...</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上诉 ViewController 省略了 UI 的具体实现过程，使用 RxCocoa 来获取输入在 UITextFiled 的名字已经获取按钮的点击这两个流，使用这两个流来创建一个 HelloViewModel.Input 实例，在将之作为参数，传递给 viewModel.transform(intput:_) 方法，获得输出 outputs 最后将输出 outputs.greeting 与greetingLabel.rx.text 绑定，实现 UI 界面的展示。 </p>
+<p>这样的设计方式，看上去挺完美的，也符合我们之前的设想，但是这里有一个问题，如果把这个 ViewModel 接入到其他 View 上，是否依然可以使用那？当然一般的 View 肯定是没有问题的，因为跟这个 View 没有什么差别，这里使用 UITableView 来接入试一下，因为 UITableView 的 cell 其实是懒加载的，我们没有办法同步获取到 textField &amp; button 的流，于是我们没有了 ViewModel.Input 实例，最后发现，这个 ViewModel 无法接入到这个 View。</p>
+<p>总结一下这个设计方法的优缺点:  </p>
+<ul>
+<li>优点:使用 func transform(input: Input) -&gt; Output 函数简单，清晰，没必要会用Subject</li>
+<li>缺点:但是有限制，这样设计的 ViewModel 只能在那些能同步获取到 View 的方案中使用。</li>
+</ul>
+<h3 id="2-使用Subject"><a href="#2-使用Subject" class="headerlink" title="2.使用Subject"></a>2.使用Subject</h3><p>基于上一种设计方式缺点的认知，我们知道，特定情况下，ViewModel.Input 不能一次性提供所有的输入，所以我们需要修改一下 ViewModelProtocol 协议，让他更加的灵活，不需要直接输入，只需要关心，一个输入，一个输出:</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">protocol</span> <span class="title">ViewModelProtocol</span> </span>&#123;</span><br><span class="line">    associatedtype <span class="type">Input</span></span><br><span class="line">    associatedtype <span class="type">Output</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> input: <span class="type">Input</span> &#123; <span class="keyword">get</span> &#125;</span><br><span class="line">    <span class="keyword">var</span> output: <span class="type">Output</span> &#123; <span class="keyword">get</span> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这种方式，View 可以选择在任何时候提供 Input ，在任何时候订阅 Output 但是有一个问题，之前是通过 transform 来连接输入跟输出的，这里取消了这个方法，我们需要另一个方案来连接，这就需要 Subject 来大显身手了，Subject 在 RxSwift 中的定义是 既是观察者，也是被观察者，因为这个特性，他可以很完美的充当一个桥梁，来连接 Input 和 Output。</p>
+<blockquote>
+<p>已知 ViewModel 有连个输入 ：name &amp; validate，所以我们需要两个 Subject 来连接他们：</p>
+</blockquote>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HelloViewModel</span>: <span class="title">ViewModelProtocol</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> input: <span class="type">Input</span></span><br><span class="line">    <span class="keyword">let</span> output: <span class="type">Output</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Input</span> </span>&#123;</span><br><span class="line">        <span class="keyword">let</span> name: <span class="type">AnyObserver</span>&lt;<span class="type">String</span>&gt;</span><br><span class="line">        <span class="keyword">let</span> validate: <span class="type">AnyObserver</span>&lt;<span class="type">Void</span>&gt;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Output</span> </span>&#123;</span><br><span class="line">        <span class="keyword">let</span> greeting: <span class="type">Driver</span>&lt;<span class="type">String</span>&gt;</span><br><span class="line">    &#125;</span><br><span class="line">	 </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">let</span> nameSubject = <span class="type">ReplaySubject</span>&lt;<span class="type">String</span>&gt;.create(bufferSize: <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">let</span> validateSubject = <span class="type">PublishSubject</span>&lt;<span class="type">Void</span>&gt;()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">init</span>() &#123;</span><br><span class="line">        <span class="keyword">let</span> greeting = validateSubject</span><br><span class="line">            .withLatestFrom(nameSubject)</span><br><span class="line">            .<span class="built_in">map</span> &#123; name <span class="keyword">in</span></span><br><span class="line">                <span class="keyword">return</span> <span class="string">"Hello \(name)!"</span></span><br><span class="line">            &#125;</span><br><span class="line">            .asDriver(onErrorJustReturn: <span class="string">":-("</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">self</span>.output = <span class="type">Output</span>(greeting: greeting)</span><br><span class="line">        <span class="keyword">self</span>.input = <span class="type">Input</span>(name: nameSubject.asObserver(), validate: validateSubject.asObserver())</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>以上:<br>因为 Subject 都是私有的，所以对整个 ViewModel 是没有影响的，只是接受一个 Input 得到一个 Output，而且 因为不是同步的获得输入和输出，也就实现了 非同步式 View 的接入问题，关于 Subject 的种类以及功能，参考<a href="https://chuqingr.cn/2018/07/28/rxSwift%E4%B8%AD%E4%BF%A1%E5%8F%B7%E7%9A%84%E5%8C%BA%E5%88%AB/" target="_blank" rel="noopener">另一篇博客</a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>上面说的两种方法是相互兼容的，可以一起使用。</p>
+
+      
+    </div>
+    
+    
+    
+    <div>
+  
+    <div>
+
+    <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+  
+    </div>
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/swift/" rel="tag"><i class="fa fa-tag"></i> swift</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/29/iOS-项目结构/" rel="next" title="iOS 项目结构与代码规范">
+                <i class="fa fa-chevron-left"></i> iOS 项目结构与代码规范
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/30/CTMediator-组件化实践/" rel="prev" title="CTMediator 组件化实践">
+                CTMediator 组件化实践 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2018/08/30/MVVM-rxSwift中VM设计方式的探究/"
+           data-title="MVVM & RxSwift 中 VM 设计方式的探究" data-url="https://www.chuqingr.cn/2018/08/30/MVVM-rxSwift中VM设计方式的探究/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Yshao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/chuqingr" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ViewModel-要具有哪些特性？"><span class="nav-number">1.</span> <span class="nav-text">ViewModel 要具有哪些特性？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-不使用Subject"><span class="nav-number">1.1.</span> <span class="nav-text">1.不使用Subject</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-使用Subject"><span class="nav-number">1.2.</span> <span class="nav-text">2.使用Subject</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">2.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yshao</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

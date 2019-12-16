@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/head.jpg?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="dyld 加载流程 1.设置上下文信息，配置进程是否受限 2.配置环境变量，获取当前运行架构 3.加载可执行文件，生成一个ImageLoader实例对象 4.检查共享缓存是否映射到了共享区域 5.加载所有插入的库 (在这一步插入动态库) 6.链接主程序（ImageLoader::link） 7.链接所有插入的库，执行符号替换 8.执行初始化方法(+load 和 constructor 方法) 9.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="笔记">
+<meta property="og:url" content="https://www.chuqingr.cn/2019/09/09/笔记/index.html">
+<meta property="og:site_name" content="Yshao的个人博客">
+<meta property="og:description" content="dyld 加载流程 1.设置上下文信息，配置进程是否受限 2.配置环境变量，获取当前运行架构 3.加载可执行文件，生成一个ImageLoader实例对象 4.检查共享缓存是否映射到了共享区域 5.加载所有插入的库 (在这一步插入动态库) 6.链接主程序（ImageLoader::link） 7.链接所有插入的库，执行符号替换 8.执行初始化方法(+load 和 constructor 方法) 9.">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.chuqingr.cn/2019/09/09/笔记/adrp.png">
+<meta property="og:updated_time" content="2019-09-10T08:10:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="笔记">
+<meta name="twitter:description" content="dyld 加载流程 1.设置上下文信息，配置进程是否受限 2.配置环境变量，获取当前运行架构 3.加载可执行文件，生成一个ImageLoader实例对象 4.检查共享缓存是否映射到了共享区域 5.加载所有插入的库 (在这一步插入动态库) 6.链接主程序（ImageLoader::link） 7.链接所有插入的库，执行符号替换 8.执行初始化方法(+load 和 constructor 方法) 9.">
+<meta name="twitter:image" content="https://www.chuqingr.cn/2019/09/09/笔记/adrp.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.chuqingr.cn/2019/09/09/笔记/"/>
+
+
+
+
+
+  <title>笔记 | Yshao的个人博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+    <a href="https://github.com/chuqingr" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#64CEAA; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yshao的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">学海无涯苦作舟</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.chuqingr.cn/2019/09/09/笔记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yshao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yshao的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">笔记</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-09T16:38:41+08:00">
+                2019-09-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/09/09/笔记/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/09/09/笔记/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="dyld-加载流程"><a href="#dyld-加载流程" class="headerlink" title="dyld 加载流程"></a>dyld 加载流程</h2><ul>
+<li>1.设置上下文信息，配置进程是否受限</li>
+<li>2.配置环境变量，获取当前运行架构</li>
+<li>3.加载可执行文件，生成一个ImageLoader实例对象</li>
+<li>4.检查共享缓存是否映射到了共享区域</li>
+<li>5.加载所有插入的库 (在这一步插入动态库)</li>
+<li>6.链接主程序（ImageLoader::link）</li>
+<li>7.链接所有插入的库，执行符号替换</li>
+<li>8.执行初始化方法(+load 和 constructor 方法)</li>
+<li>9.寻找主程序入口（main 函数）<a id="more"></a>
+<h2 id="Mach-O-文件格式"><a href="#Mach-O-文件格式" class="headerlink" title="Mach-O 文件格式"></a>Mach-O 文件格式</h2></li>
+<li>Mach-O头部</li>
+<li>Load Command</li>
+<li>Section</li>
+<li>Other Data</li>
+</ul>
+<h3 id="头部-组成"><a href="#头部-组成" class="headerlink" title="头部 组成"></a>头部 组成</h3><blockquote>
+<ul>
+<li>1.magic：Mach-O 文件的魔数。</li>
+<li>2.cputype,cpusubtype：CPU架构和子版本</li>
+<li>3.filetype：文件类型。MH_OBJECT（目标文件），MH_EXECUTABLE（可执行二进制文件），MH_DYLIB(动态库)</li>
+<li>4.ncmds：加载命令的数量</li>
+<li>5.sizeofcmds：所有加载命令的大小</li>
+<li>6.flags：dyld加载需要的一些标记，MH_PIE 表示启用地址空间布局随机化</li>
+<li>7.reserved：64位保留字段</li>
+</ul>
+</blockquote>
+<h3 id="Load-Command的作用"><a href="#Load-Command的作用" class="headerlink" title="Load Command的作用"></a>Load Command的作用</h3><p>Load Command 告诉操作系统应当如何加载文件中的数据，对系统内核加载器和动态连接器起知道作用。</p>
+<h2 id="懒加载和非懒加载-（fishhook-的切入点）"><a href="#懒加载和非懒加载-（fishhook-的切入点）" class="headerlink" title="懒加载和非懒加载 （fishhook 的切入点）"></a>懒加载和非懒加载 （fishhook 的切入点）</h2><ul>
+<li>1.非懒加载符号，在dyld加载时就会绑定真实的值。</li>
+<li>2.懒加载符号，只有在第1次去调用时才会绑定真是的地址，第二次直接使用真实的地址。（printf是懒加载符号）</li>
+</ul>
+<h3 id="懒加载第一次加载流程-以-printf-为例"><a href="#懒加载第一次加载流程-以-printf-为例" class="headerlink" title="懒加载第一次加载流程 以 printf 为例"></a>懒加载第一次加载流程 以 printf 为例</h3><blockquote>
+<ul>
+<li>第一次调用printf </li>
+<li>通过<strong>stubs找到 </strong>la_symbol_ptr中的指针  </li>
+<li><strong>stub_helper 带上偏移跳转到 </strong>stub_helper头部 </li>
+<li>dyld_stub_binder 调用 _dyld_fast_stub_enty 执行绑定</li>
+<li>从Lazy Bindding info 定位，真实符号模块并写回 __la_symbol_ptr</li>
+</ul>
+</blockquote>
+<h3 id="Code-Signature"><a href="#Code-Signature" class="headerlink" title="Code Signature"></a>Code Signature</h3><h2 id="ARM-架构和指令集"><a href="#ARM-架构和指令集" class="headerlink" title="ARM 架构和指令集"></a>ARM 架构和指令集</h2><h3 id="ARMv8为了保持向后兼容，提供了如下支持："><a href="#ARMv8为了保持向后兼容，提供了如下支持：" class="headerlink" title="ARMv8为了保持向后兼容，提供了如下支持："></a>ARMv8为了保持向后兼容，提供了如下支持：</h3><blockquote>
+<ul>
+<li>64位执行状态：AArch64，意味着地址保存在64位寄存器中，基本指令集中的执行使用64位寄存器进行处理。AArch64 状态支持 A64 指令集，也就是 ARM64 指令集。（现在大部分都是 arm64 机构的设备）</li>
+<li>32位执行状态 AArch32，意味着地址保存在32位寄存器中，基本指令集中的指令使用32位寄存器进行处理，AArch32 状态支持T32 和 A32指令集，也就是 thumb 和 ARM 指令集。AArch32 的目的是兼容 ARMv7-A，同事增加了一些 AArch64 的特性。</li>
+</ul>
+</blockquote>
+<h4 id="ARM-组成"><a href="#ARM-组成" class="headerlink" title="ARM 组成"></a>ARM 组成</h4><blockquote>
+<p>A:Application 体系，支持基于内存管理的虚拟内存系统架构，并支持A64、A32和T32指令集。<br>R:Real-time 体系，为具有严格的实时响应限制的深层嵌入式应系统提供高性能的计算解决方案，支持A32和T32指令集。<br>M:Microcontroller 体系，面向各类嵌入式应用，支持T32指令集的变体。</p>
+</blockquote>
+<h3 id="AArch64-寄存器"><a href="#AArch64-寄存器" class="headerlink" title="AArch64 寄存器"></a>AArch64 寄存器</h3><ul>
+<li>支持多级别的执行权限，用EL0 ~ EL3 标识不同的异常级别，EL0 对应于最低权限级别，通常被描述为无特权级别，编写的应用一般都运行与 EL0级别。</li>
+</ul>
+<h4 id="EL0级别课件的寄存器和进程状态"><a href="#EL0级别课件的寄存器和进程状态" class="headerlink" title="EL0级别课件的寄存器和进程状态"></a>EL0级别课件的寄存器和进程状态</h4><h5 id="1-寄存器"><a href="#1-寄存器" class="headerlink" title="1.寄存器"></a>1.寄存器</h5><p>R0 ~ R30 是31个通用寄存器，每个寄存器有如下两种访问方式</p>
+<blockquote>
+<ul>
+<li>64 位通用寄存器名为 X0 ~ X30</li>
+<li>32 位通用寄存器名为 W0 ~ W30</li>
+</ul>
+</blockquote>
+<p>Wn 标识 Xn 的低32位，X30 用于程序调用的link register，link register 是一个特殊的寄存器，用于保存一个函数调用完成时的返回地址。</p>
+<h6 id="ZR-0寄存器"><a href="#ZR-0寄存器" class="headerlink" title="ZR(0寄存器)"></a>ZR(0寄存器)</h6><p>在指令编码中，0b11111（31）用来标识ZR，只标识参数为0，并不标识ZR是一个物理寄存器。</p>
+<h6 id="其他寄存器"><a href="#其他寄存器" class="headerlink" title="其他寄存器"></a>其他寄存器</h6><blockquote>
+<ul>
+<li>SP 为64位专用堆栈指针寄存器，可以通过寄存器名 WSP 访问堆栈指针的最低有效32位。</li>
+<li>PC 为保存当前指令地址的64位程序计数器，程序不能直接写 PC，只能在分支、异常条目或异常返回时更新。（由于 AArch32 为多流水线，所以需要加上4 或者 8 的偏移）。</li>
+<li>V0 ~ V31 为32 SIMD&amp;FP registers。V0 ~ V31 寄存器主要用于浮点数的运算，寄存器可以访问的内容如下，<ul>
+<li>128 位寄存器，Q0-Q31</li>
+<li>64 位寄存器，D0-D31</li>
+<li>32 位寄存器，S0-S31</li>
+<li>16 位寄存器，H0-H31</li>
+<li>8 位寄存器，B0-B31</li>
+<li>128 位元素向量</li>
+<li>64 位元素向量</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<h5 id="2-进程状态-PSTATE"><a href="#2-进程状态-PSTATE" class="headerlink" title="2.进程状态 PSTATE"></a>2.进程状态 PSTATE</h5><p>PSTATE 不是寄存器，而是进程状态信息的抽象。所有指令集都提供了操作 PSTATE 元素的指令。以下 PSTATE 信息 可在 EL0级别访问：</p>
+<ul>
+<li>N:正负标志。当两个有符号证书进行运算时，1标识结果是负数，0标识是证书或者0。</li>
+<li>Z:零标志。1表示运算的结果为0，0表示结果不为0.</li>
+<li>C:当加法运算产生进位时为1，否则为0；当减法运算产生借位时为0，否则为1.</li>
+<li>V:在加减运算指令中每当操作数和运算结果为二进制的补码表示的带符号数时，1表示符号溢出。</li>
+</ul>
+<p>以上均为条件标志位。</p>
+<h4 id="指令集编码"><a href="#指令集编码" class="headerlink" title="指令集编码"></a>指令集编码</h4><p>例子：08 00 00 D0<br>iOS 是小端排序，所以需要倒过来看 D0 00 00 08<br>对应二进制<br>31                  15                0<br>1101 0000 0000 0000 0000 0000 0000 1000<br>根据 ARM 手册 查找 A64 指令集编码格式， 28 ~ 25 位的值可以确定当前指令的分组，<br>这里 28 ~ 25 位 为 0b1000 查表 对应的（100x）指令是：数据处理（立即数）。<br>立即数分组的指令编码为 25 ~ 23 位 为 0b000 立即数指令分组表（00x） 得到当前为 相对 PC 地址偏移指令。该分组下只有两个指令，分别是 ADR 和 ADRP，根据31位的值来判断，如果是1，就是ADRP指令，否则为ADR，这里为1 所以是ADRP指令。<br>ADRP 的指令的组成如图：<br><img src="/2019/09/09/笔记/adrp.png" alt="ADRP"></p>
+<p>ADRP 的指令为：ADRP <xd>,<lbael><br>Xd 中的 d 是由 Rd 转换成整数得到，对应为0b01000，也就是8，所以目标寄存器是 X8<br>label 是由immlo + immhi  左移动12位得到，即:<br>immhi+immlo = 0000 0000 0000 0000 0010  &lt;&lt; 12 = 0000 0010 0000 0000 0000<br>也就是：0x2000<br>所以这个指令的结果是：ADRP x8，0x2000<br>这个指令的意思：拿到当前PC寄存器的值，然后后12位（2进制是12位，16进制是3位）置0，在加上0x2000,复制给X8寄存器，假设当前寄存器的值为0x100023769，那么X8位0x10002300+0x2000 = 0x10004300。</lbael></xd></p>
+<h3 id="AArch64-指令"><a href="#AArch64-指令" class="headerlink" title="AArch64 指令"></a>AArch64 指令</h3><p>主要分为三类：</p>
+<ul>
+<li>数据处理指令</li>
+<li>加载存储指令</li>
+<li>跳转指令</li>
+</ul>
+<p>算数指令：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">指令</th>
+<th style="text-align:center">例子</th>
+<th style="text-align:center">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">ADD</td>
+<td style="text-align:center">add x0,x1,x2</td>
+<td style="text-align:center">x0 = x1 + x2</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">SUB</td>
+<td style="text-align:center">sub w0,w1,w2</td>
+<td style="text-align:center">w0 = w1 - w2</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">CMP</td>
+<td style="text-align:center">cmp w0,#0x0</td>
+<td style="text-align:center">w0和0相减，并影响条件标志位</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">CMN</td>
+<td style="text-align:center">cmn w0,#0x10</td>
+<td style="text-align:center">w0和0x10相加，并影响条件标志位</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">ADDS or SUBS</td>
+<td style="text-align:center">adds x0,x1,x2</td>
+<td style="text-align:center">后面带 s 标识计算的结果影响条件标志位</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>逻辑指令：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">指令</th>
+<th style="text-align:center">例子</th>
+<th style="text-align:center">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">AND</td>
+<td style="text-align:center">and x0,x1,x2</td>
+<td style="text-align:center">x0 = x1 &amp; x2  ANDS 标识影响条件标志位</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">EOR</td>
+<td style="text-align:center">eor,w0,w1,w2</td>
+<td style="text-align:center">w0 = w1 ^ w2</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">ORR</td>
+<td style="text-align:center">orr w0,w1,w2</td>
+<td style="text-align:center">w0 = w1</td>
+<td>w2</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">TST</td>
+<td style="text-align:center">tst x0,#0x8</td>
+<td style="text-align:center">测试bit_3 是否为0，和 ANDS 的计算方式一样，只是TST指令不保存计算结果</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>数据传输指令：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">指令</th>
+<th style="text-align:center">例子</th>
+<th style="text-align:center">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">MOV</td>
+<td style="text-align:center">mov x0,x1</td>
+<td style="text-align:center">x0 = x1</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">MOVZ</td>
+<td style="text-align:center">MOVZ Xn,#uimm16{,LSL #pos}</td>
+<td style="text-align:center">Xn = LSL(uimm16,pos)</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">MOVN</td>
+<td style="text-align:center">MOVN Xn,#uimm16{,LSL #pos}</td>
+<td style="text-align:center">Xn = NOT(LSL(uimm16,pos))</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">MOVK</td>
+<td style="text-align:center">MOVK XN,#uimm16{,LSL #pos}</td>
+<td style="text-align:center">Xnpos+15Lpos = uimm16</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>地址偏移指令：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">指令</th>
+<th style="text-align:center">例子</th>
+<th style="text-align:center">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">ADR</td>
+<td style="text-align:center">adr x1,0x1234</td>
+<td style="text-align:center">x1 = pc + 0x1234</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">ADRP</td>
+<td style="text-align:center">adrp x1,0x1234</td>
+<td style="text-align:center">base = PC[11:0] = ZERO(12);x1 = base + 0x1234</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>移位运算指令：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">指令</th>
+<th style="text-align:center">例子</th>
+<th style="text-align:center">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">ASR</td>
+<td style="text-align:center">ASR Xd,Xn,#uimm</td>
+<td style="text-align:center">算数右移，移位过程中符号位不变</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">LSL</td>
+<td style="text-align:center">LSL,Xd,Xn,#uimm</td>
+<td style="text-align:center">逻辑左移，移位后寄存器空出的低位补0</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">LSR</td>
+<td style="text-align:center">LSR,Xd,Xn,#uimm</td>
+<td style="text-align:center">逻辑右移，移位后寄存器空出的高位补0</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">ROR</td>
+<td style="text-align:center">RPR,Xd,Xn,#uimm</td>
+<td style="text-align:center">循环右移，从右端移除的位将被插入到左侧空出的位</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>常见的加载存储指令：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">指令</th>
+<th style="text-align:center">例子</th>
+<th style="text-align:center">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">LDR</td>
+<td style="text-align:center">LDR Xn/Wn,addr</td>
+<td style="text-align:center">从 addr 地址中读取8/4自己内容到Xn/Wn</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">STR</td>
+<td style="text-align:center">STR Xn/Wn,addr</td>
+<td style="text-align:center">将 Xn/Wn 写入 addr 地址执行的内存</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">LDUR</td>
+<td style="text-align:center">LDUR Xn,[base,#simm9]</td>
+<td style="text-align:center">从 base+simm9 地址中读取数据到Xn。Unscaled 标识不需要对齐，读取的数据是多少，这里就是多少</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">STUR</td>
+<td style="text-align:center">STUR Xn,[base,#simm9]</td>
+<td style="text-align:center">将Xn 写入base+simm9 地址指向的内存</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">STP</td>
+<td style="text-align:center">STP Xn1,Xn2,addr</td>
+<td style="text-align:center">将Xn1 和 Xn2 写入地址为 addr 的内存</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">LDP</td>
+<td style="text-align:center">LDR Xn1,Xn2,addr</td>
+<td style="text-align:center">从地址 addr 处读取内存到 Xn1 和 Xn2</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>加载指令可以使用立即数，寄存器和对齐寄存器作为偏移，例如：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">指令</th>
+<th style="text-align:center">例子</th>
+<th style="text-align:center">结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">ldr</td>
+<td style="text-align:center">x1,[x2,#4]</td>
+<td style="text-align:center">读取地址 x2+4 处的值到 x1</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">ldr</td>
+<td style="text-align:center">x1,[x2,x3]</td>
+<td style="text-align:center">读取地址为 x2 + x3 出的值到x1中</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">ldr</td>
+<td style="text-align:center">x1,[x2,x3,LSL #3]</td>
+<td style="text-align:center">读取地址为 x2 + x3*8 处的值到 x1中</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">ldr</td>
+<td style="text-align:center">x1,[x2,#4]!</td>
+<td style="text-align:center">读取地址为x2 + 4出的值到 x1,然后执行 x2 = x2+4</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">ldr</td>
+<td style="text-align:center">x1,[SP],#0X4</td>
+<td style="text-align:center">读取地址为sp的值到x1中，然后执行 sp = sp + 4</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>条件跳转指令：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">指令</th>
+<th style="text-align:center">例子</th>
+<th style="text-align:center">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">B.cond</td>
+<td style="text-align:center">B.cond label</td>
+<td style="text-align:center">如果 cond 条件为真，则跳转到 label</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">CBNZ</td>
+<td style="text-align:center">CBNZ Xn,label</td>
+<td style="text-align:center">如果 Xn 不为0，则跳转到label</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">CBZ</td>
+<td style="text-align:center">CBZ Xn,label</td>
+<td style="text-align:center">如果 Xn 为0，则跳转到label</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">TBNZ</td>
+<td style="text-align:center">TBNZ Xn,#uimm6,label</td>
+<td style="text-align:center">如果Xn[uimm6] != 0 ,则跳转到 label</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">TBZ</td>
+<td style="text-align:center">TBZ Xn,#uimm6,label</td>
+<td style="text-align:center">如果Xn[uimm6] = 0 ,则跳转到 label</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>无条件跳转指令：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">指令</th>
+<th style="text-align:center">例子</th>
+<th style="text-align:center">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">B</td>
+<td style="text-align:center">B label</td>
+<td style="text-align:center">无条件跳转</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">BL</td>
+<td style="text-align:center">BL label</td>
+<td style="text-align:center">无条件跳转，会将下一跳指令地址写到 X30（link register）处（函数跳转，会返回）</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">BLR</td>
+<td style="text-align:center">BLR Xn</td>
+<td style="text-align:center">无条件跳转到 Xn 寄存器的地址，会将下一条指令地址写到 X30（link register） 处</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">BR</td>
+<td style="text-align:center">BR Xn</td>
+<td style="text-align:center">无条件跳转到 Xn 寄存器的地址</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center">RET</td>
+<td style="text-align:center">ret</td>
+<td style="text-align:center">子程序返回</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="栈-和-方法"><a href="#栈-和-方法" class="headerlink" title="栈 和 方法"></a>栈 和 方法</h3><h4 id="栈的定义"><a href="#栈的定义" class="headerlink" title="栈的定义"></a>栈的定义</h4><blockquote>
+<p>栈是被限定只能在一端进行插入或删除操作的线性表。对于栈来说，可以进行插入或删除的一端成为栈顶，另一端成为栈底。因为只能在一端进行操作，所以按照后进先出的原理运作，也就是最后入栈的元素会先出栈。</p>
+</blockquote>
+<h4 id="函数调用栈"><a href="#函数调用栈" class="headerlink" title="函数调用栈"></a>函数调用栈</h4><p>进程中的堆栈，是一种特殊的内存区域，跟数据结构中的栈很像，在调用一个函数时，用于保存一些临时的数据，例如局部变量和上下文环境。<br>    根据栈的增长方向和栈顶指针指向的位置，可以将其分为如下4中类型。</p>
+<ul>
+<li>向搞地质方向生产，称为递增堆栈</li>
+<li>想低地址方向生产，称为递减堆栈</li>
+<li>堆栈指针指向最后压入堆栈的有效数据项，成为满堆栈</li>
+<li>堆栈指针指向下一个要放入的空位置，成为空堆栈</li>
+</ul>
+<p>而 ARM 堆栈具有后进先出和满递减的特点,</p>
+<ul>
+<li>栈中的元素按ABCD的顺序入栈，按DCBA的顺序出栈</li>
+<li>栈是向低地址方向生长的</li>
+<li>SP 指向栈顶的元素，其他袁术通过 SP + offset 获取</li>
+</ul>
+<p>函数的调用，会开辟栈帧，在 AArch64 中，函数的参数是通过x0 ~ x7 传递的（不考虑浮点数和向量寄存器）（如果函数参数多余寄存器个数，那么剩余的参数将通过栈传递），还有一些与函数堆栈相关的寄存器，列举如下：</p>
+<ul>
+<li>PC 寄存器：记录当前执行代码的地址</li>
+<li>SP 寄存器：指向栈帧的指针（栈顶指针），在内存操作指令中听过x31 寄存器来访问</li>
+<li>LR 寄存器：指向返回地址，对应于x30 寄存器</li>
+<li>FP 寄存器：指向栈帧的地步，对应于寄存器x29</li>
+</ul>
+<p>函数调用的栈帧包括以下部分:</p>
+<ul>
+<li>参数区（parameter area）:存放调用函数传递的参数</li>
+<li>连接区（linkage area）：存放调用者（caller）的下一条指令</li>
+<li>栈帧指针存放区（frame pointer）：存放调用函数的栈帧的底部</li>
+<li>寄存器存储区（saved registers area）：被调用函数（callee）返回需要恢复的寄存器内容</li>
+<li>局部存储区（local storage area）：用于存放被调用函数（callee）的局部变量</li>
+</ul>
+<p>函数调用前：</p>
+<ul>
+<li>1.开辟栈帧空间</li>
+<li>2.保存FP和LR寄存器，以便找到上一个栈帧和返回地址</li>
+<li>3.设置新的FP寄存器</li>
+<li>4.保存子函数会用到的寄存器</li>
+<li>5.保存局部变量或参数</li>
+</ul>
+<p>函数调用结束：</p>
+<ul>
+<li>1.还原FP和LR寄存器</li>
+<li>2.释放栈帧控件</li>
+<li>3.跳到LR子程序返回</li>
+</ul>
+<p>函数调用之后，一般通过x0寄存器返回结果，但是，x0寄存器最多只能保存一个地址或者8字节的数据，如果返回的数据大于8字节，会通过 x8 寄存器指向的内存来传递放回值。</p>
+<h3 id="Objective-C-汇编"><a href="#Objective-C-汇编" class="headerlink" title="Objective-C 汇编"></a>Objective-C 汇编</h3><p>在 OC 中，调用一个函数是通过[ClassName methodName:arg0]的方式实现的。<br>x0 寄存器对应 调用的对象，即：self，x1 表示调用的方法名字，其他参数存储在x2 ~ x7 或者堆栈里（浮点数除外）。</p>
+<h3 id="hook"><a href="#hook" class="headerlink" title="hook"></a>hook</h3><p>iOS 中常见的 hook 方式如下：</p>
+<ul>
+<li>Method Swizzle：通过修改 OC 函数的 IMP 达到替换方法的实现的效果，仅针对 OC 函数，在越狱和非越狱平台上都可以使用。</li>
+<li>fishhook：通过修改内存中的懒加载和非懒加载符号表指针锁指向的地址来达到修改方法的目的，作用于主模块懒加载和非懒加载表中的符号，在越狱和非越狱平台上都可以使用。</li>
+<li>Cydia Substrate：通过inline hook的方式修改目标函数内存中的汇编指令，使其跳转到自己的代码块，以达到修改程序的目的，同时支持Method Swizzle，inline hook的方式只能在越狱平台上使用（在非越狱平台上静态修改文件进行跳转时也可以）</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+    <div>
+  
+    <div>
+
+    <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+  
+    </div>
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/03/AirPlay-自投屏-技术分析/" rel="next" title="AirPlay 自投屏 技术分析">
+                <i class="fa fa-chevron-left"></i> AirPlay 自投屏 技术分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/09/17/LeetCode/" rel="prev" title="LeetCode">
+                LeetCode <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2019/09/09/笔记/"
+           data-title="笔记" data-url="https://www.chuqingr.cn/2019/09/09/笔记/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Yshao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/chuqingr" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#dyld-加载流程"><span class="nav-number">1.</span> <span class="nav-text">dyld 加载流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mach-O-文件格式"><span class="nav-number">2.</span> <span class="nav-text">Mach-O 文件格式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#头部-组成"><span class="nav-number">2.1.</span> <span class="nav-text">头部 组成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Load-Command的作用"><span class="nav-number">2.2.</span> <span class="nav-text">Load Command的作用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#懒加载和非懒加载-（fishhook-的切入点）"><span class="nav-number">3.</span> <span class="nav-text">懒加载和非懒加载 （fishhook 的切入点）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#懒加载第一次加载流程-以-printf-为例"><span class="nav-number">3.1.</span> <span class="nav-text">懒加载第一次加载流程 以 printf 为例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Code-Signature"><span class="nav-number">3.2.</span> <span class="nav-text">Code Signature</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ARM-架构和指令集"><span class="nav-number">4.</span> <span class="nav-text">ARM 架构和指令集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ARMv8为了保持向后兼容，提供了如下支持："><span class="nav-number">4.1.</span> <span class="nav-text">ARMv8为了保持向后兼容，提供了如下支持：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ARM-组成"><span class="nav-number">4.1.1.</span> <span class="nav-text">ARM 组成</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AArch64-寄存器"><span class="nav-number">4.2.</span> <span class="nav-text">AArch64 寄存器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#EL0级别课件的寄存器和进程状态"><span class="nav-number">4.2.1.</span> <span class="nav-text">EL0级别课件的寄存器和进程状态</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-寄存器"><span class="nav-number">4.2.1.1.</span> <span class="nav-text">1.寄存器</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#ZR-0寄存器"><span class="nav-number">4.2.1.1.1.</span> <span class="nav-text">ZR(0寄存器)</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#其他寄存器"><span class="nav-number">4.2.1.1.2.</span> <span class="nav-text">其他寄存器</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-进程状态-PSTATE"><span class="nav-number">4.2.1.2.</span> <span class="nav-text">2.进程状态 PSTATE</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#指令集编码"><span class="nav-number">4.2.2.</span> <span class="nav-text">指令集编码</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AArch64-指令"><span class="nav-number">4.3.</span> <span class="nav-text">AArch64 指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#栈-和-方法"><span class="nav-number">4.4.</span> <span class="nav-text">栈 和 方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#栈的定义"><span class="nav-number">4.4.1.</span> <span class="nav-text">栈的定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#函数调用栈"><span class="nav-number">4.4.2.</span> <span class="nav-text">函数调用栈</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Objective-C-汇编"><span class="nav-number">4.5.</span> <span class="nav-text">Objective-C 汇编</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hook"><span class="nav-number">4.6.</span> <span class="nav-text">hook</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yshao</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/head.jpg?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="other," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="架构 最近开始自己的一个新的项目，于是开始总结审视最近所得，选择一个最合适的架构，于是对自己了解到的架构知识进行了进一步的总结。">
+<meta name="keywords" content="other">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS项目架构的选择">
+<meta property="og:url" content="https://www.chuqingr.cn/2018/08/28/iOS项目架构的选择/index.html">
+<meta property="og:site_name" content="Yshao的个人博客">
+<meta property="og:description" content="架构 最近开始自己的一个新的项目，于是开始总结审视最近所得，选择一个最合适的架构，于是对自己了解到的架构知识进行了进一步的总结。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.chuqingr.cn/2018/08/28/iOS项目架构的选择/p1.jpg">
+<meta property="og:image" content="https://www.chuqingr.cn/2018/08/28/iOS项目架构的选择/p2.jpg">
+<meta property="og:updated_time" content="2018-08-30T04:34:35.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS项目架构的选择">
+<meta name="twitter:description" content="架构 最近开始自己的一个新的项目，于是开始总结审视最近所得，选择一个最合适的架构，于是对自己了解到的架构知识进行了进一步的总结。">
+<meta name="twitter:image" content="https://www.chuqingr.cn/2018/08/28/iOS项目架构的选择/p1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.chuqingr.cn/2018/08/28/iOS项目架构的选择/"/>
+
+
+
+
+
+  <title>iOS项目架构的选择 | Yshao的个人博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+    <a href="https://github.com/chuqingr" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#64CEAA; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yshao的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">学海无涯苦作舟</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.chuqingr.cn/2018/08/28/iOS项目架构的选择/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yshao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yshao的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS项目架构的选择</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-28T08:56:42+08:00">
+                2018-08-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/08/28/iOS项目架构的选择/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/08/28/iOS项目架构的选择/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h1><blockquote>
+<p>最近开始自己的一个新的项目，于是开始总结审视最近所得，选择一个最合适的架构，于是对自己了解到的架构知识进行了进一步的总结。<br><a id="more"></a></p>
+</blockquote>
+<h2 id="为什么要研究架构？"><a href="#为什么要研究架构？" class="headerlink" title="为什么要研究架构？"></a>为什么要研究架构？</h2><ul>
+<li>1.代码均摊</li>
+</ul>
+<blockquote>
+<p>试想如果所有代码都集中在一个 UIViewController 中，App 理论上确实能够运行，然而当调试时面对拥有庞大代码的单个文件，我们需要花大量的时间去找到发生问题的源头(曾经接手过一个最大单个 VC 1.3W+行代码的项目，真的是痛不欲生)。同时在修改代码的同时，又因为所有代码都集中在一处，我们必须格外小心，防止一处修改、他处崩溃这种牵一发而动全身的情况出现。这种就像很多团电路交错在一起，即使是熟练的电工也因为过于复杂而觉得无从下手。真正的架构应该合理分配代码，每个类、结构体、方法、变量的存在都应该遵循单一职责原则</p>
+</blockquote>
+<ul>
+<li>2.方便测试  </li>
+</ul>
+<blockquote>
+<p>为了确保代码的质量，我们会进行各种测试。主要的测试有：单元测试、性能测试、UI 测试。但是这些测试都是针对单个方法或界面进行的测试。合理的架构可以让各个测试可以各司其职、不重复、不遗漏，让测试的代码覆盖率提高，可以更简单便捷的写出高效的测试代码。</p>
+</blockquote>
+<ul>
+<li>3.可扩展性(易用性)</li>
+</ul>
+<blockquote>
+<p>一个好的架构可以让你轻松的应对日后开发中的各种新的需求，即使是新人也能很快的上手并进行开发。</p>
+</blockquote>
+<h2 id="有哪些架构？"><a href="#有哪些架构？" class="headerlink" title="有哪些架构？"></a>有哪些架构？</h2><h3 id="1-苹果官方的-MVC-架构"><a href="#1-苹果官方的-MVC-架构" class="headerlink" title="1.苹果官方的 MVC 架构"></a>1.苹果官方的 MVC 架构</h3><p>MVC 的优点:</p>
+<ul>
+<li>1.<b>代码总量少</b>。基本上大量的逻辑和视图代码都集中在 ViewController 里，View 和 Model 也严格区分，代码分配遵循一定规则。</li>
+<li>2.<b>简单易懂</b>。新人可以快速上手；修改和增加新的功能也没有明显障碍；即使是没有经验的开发者也可以很好维护。</li>
+</ul>
+<p>缺点(主要由视图层 和控制器层高度耦合造成):</p>
+<ul>
+<li><p>1.<b>代码过度集中</b>。ViewController 因为将两部分高度耦合，它将处理交互、视图更新、布局、Model 数据获取和修改、导航等几乎所有操作。</p>
+</li>
+<li><p>2.<b>难以进行测试</b>。由于高度耦合，使得用于检测功能为主的单元测试需要配合特定视图才能进行，测试难度陡增。所以经常在 MVC 架构中，开发者一般只对 Model 进行测试。</p>
+</li>
+<li><p>3.<b>扩展难度大</b>。在 ViewController 中添加新功能需要格外小心，高度耦合的逻辑结构有时候会让新加的代码错漏百出。同时由于 View &amp; Controller 互相依赖，新增功能会使得ViewController越发的笨重，进一步提高维护的成本。</p>
+</li>
+<li><p>4.<b>Model层过于简单</b>。跟臃肿的 ViewController 相比，MVC的Model层却只是定义了几个属性。在OC中，.m 文件更是基本上没有代码。</p>
+</li>
+<li><p>5.<b>无从安放的网络请求</b>。因为网络层都是异步调用，如果放在Model层，那么Model层会变得异常的复杂。如果放在ViewController中，那么耦合会进一步增加。</p>
+</li>
+</ul>
+<p>代码示例（来自网络）:</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> name: <span class="type">String</span></span><br><span class="line">  <span class="keyword">var</span> avatar: <span class="type">UIImage</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">init</span>(<span class="number">_</span> name: <span class="type">String</span>, <span class="number">_</span> avatar: <span class="type">UIImage</span>) &#123;</span><br><span class="line">    <span class="keyword">self</span>.name = name</span><br><span class="line">    <span class="keyword">self</span>.avatar = avatar</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">extension</span> <span class="title">UIImageView</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">func</span> <span class="title">configure</span><span class="params">(with user: User)</span></span> &#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ViewController</span>: <span class="title">UIViewController</span> </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> user: <span class="type">User</span>?</span><br><span class="line">  <span class="keyword">var</span> userImageView: <span class="type">UIImageView</span>?</span><br><span class="line"></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">viewDidLoad</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.viewDidLoad()</span><br><span class="line"></span><br><span class="line">    userImageView = <span class="type">UIImageView</span>()</span><br><span class="line">    userImageView.configure(with: user)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>以上代码是经典的MVC架构，然后有两处地方让 View &amp; Model 耦合在了一起。</p>
+<ul>
+<li>1.userImageView 作为 View 层，是不应该直接持有 Model 层的，而在 ViewDidLoad 中，我们却发现 userImageView 直接可以调用 User 去进行操作。这个操作应该由 中介者(ViewController) 来完成。</li>
+<li>2.User 类作为 Model 层，其内部不应该持有 UIImage 这种视图属性。</li>
+</ul>
+<p>修改后：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> name: <span class="type">String</span></span><br><span class="line">  <span class="keyword">var</span> avatarData: <span class="type">Data</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">init</span>(<span class="number">_</span> name: <span class="type">String</span>, <span class="number">_</span> avatarData: <span class="type">Data</span>) &#123;</span><br><span class="line">    <span class="keyword">self</span>.name = name</span><br><span class="line">    <span class="keyword">self</span>.avatarData = avatarData</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ViewController</span>: <span class="title">UIViewController</span> </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> user: <span class="type">User</span>?</span><br><span class="line">  <span class="keyword">var</span> userImageView: <span class="type">UIImageView</span>?</span><br><span class="line"></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">viewDidLoad</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.viewDidLoad()</span><br><span class="line"></span><br><span class="line">    userImageView = <span class="type">UIImageView</span>()</span><br><span class="line">    configure(userImageView, with: user)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">func</span> <span class="title">configure</span><span class="params">(<span class="number">_</span> imageView: UIImageView?, with user: User)</span></span> &#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="2-MVCS架构"><a href="#2-MVCS架构" class="headerlink" title="2.MVCS架构"></a>2.MVCS架构</h3><p>MVCS 架构其实就是针对 MVC 的优化。S 是 Store 的缩写，意为存储。一般数据持续化层（例如 Core Data ）就是 Store，我们把这部分代码单独从 Model 或是 ViewController 里拆分出来构成单独的文件，这就是所谓的数据层。</p>
+<p>之前我们提到，MVC 的缺点之一就是网络层无处安放。其实根据 MVCS 这个思路，我们我们也可以把网络层放在 S 这一层中。毕竟网络请求也是获得数据，而且一般 API 请求之后数据都要做缓存和持久化处理，所以放在 S（数据层）来说也比较合理。</p>
+<p>拆分出来之后，整个代码分配更加均衡。同时以往在 ViewController 里面难以进行的单元测试也可以根据单独的数据层文件进行测试，总体来讲测试覆盖率会有所提高。整个拆分之后对于整体架构的维护和扩展也起到了促进作用。</p>
+<h3 id="3-MVP-和-MVC-相比有什么异同？"><a href="#3-MVP-和-MVC-相比有什么异同？" class="headerlink" title="3. MVP 和 MVC 相比有什么异同？"></a>3. MVP 和 MVC 相比有什么异同？</h3><p>MVP 的全称是 Model-View-Presenter。它和 MVC 的相同点在于：两者的 Model 功能一样，理论上来讲两者的 Model 层应该完全一样。</p>
+<p>而不同点在于，MVC 中 View 和 Controller 耦合在 ViewController 类里；而 MVP 的 View 是单独的 UIView/UIViewController，Presenter 也是单独的类。我们来看下 MVP 的结构：<br><img src="/2018/08/28/iOS项目架构的选择/p1.jpg" alt="p1"></p>
+<p>如图，MVP 中的 View 是单独的 Class（在 MVP 中，UIView 或是 UIViewController 都属于 View 层），它持有 Presenter 作为变量。当接收到用户交互时，它会调用 Presenter 进行处理。也就是说，View 层不包含任何的业务逻辑代码，它只会将交互交给 Presenter，并从 Presenter 那里接受结果来更新自己。</p>
+<p>而 MVP 中的 Presenter 则负责业务逻辑，它是 View 和 Model 的桥接。它会根据 View 中的交互去修改 Model，或根据 Model 的变化去修改 View。</p>
+<p>这里要注意，因为 View 持有 Presenter，所以 Presenter 中的 View 应该声明为 weak 或 unowned，以避免循环引用。</p>
+<p>相比于 MVC，MVP 的耦合度大大降低，代码分配更加合理，测试起来非常方便，整个架构理解和上手难度也并不高。</p>
+<p>但是它的缺点在于，View 的所有交互都要传给 Presenter 去处理，这样就项目功能一旦增加，View 的代码和 Presenter 的代码都会增加。相比于 MVC 在 ViewController 一个文件里面直接解决，MVP 的总代码量可能会翻倍，这样 App 的维护成本和文件大小都会增大。</p>
+<h3 id="4-MVVM-中的-ViewModel-的作用是什么？"><a href="#4-MVVM-中的-ViewModel-的作用是什么？" class="headerlink" title="4.MVVM 中的 ViewModel 的作用是什么？"></a>4.MVVM 中的 ViewModel 的作用是什么？</h3><p>ViewModel 一般来扮演两个重要角色：</p>
+<ul>
+<li>1.<b>视图层的真正数据提供者</b>。一般视图层展示的数据经常是当个或是多个模型的属性组合。例如微博数据流界面，可能一个微博用户模型有 firstName, lastName, status, post 多个属性，ViewModel 就会将这些数据整合在一起，使得视图可以直接调用单个数据就展示所要的效果。简单来说，ViewModel 就是为了视图展示，而对模型层的数据包装。</li>
+<li>2.<b>视图层的交互响应者</b>。所有用户的交互都会传递给 ViewModel，ViewModel 会依次更新视图层需要的属性，同时相应修改模型层的数据。这里依靠的是属性观察或响应式架构。<br>注意 ViewModel 类中绝对不能包含视图层的任何类或结构体。MVVM 的示意图如下：<br><img src="/2018/08/28/iOS项目架构的选择/p2.jpg" alt="p2"></li>
+</ul>
+<h3 id="5-MVC，MVP，MVVM-三种架构的比较"><a href="#5-MVC，MVP，MVVM-三种架构的比较" class="headerlink" title="5.MVC，MVP，MVVM 三种架构的比较"></a>5.MVC，MVP，MVVM 三种架构的比较</h3><blockquote>
+<p>MVC、MVP、MVVM 三种架构皆由模型层（M - Model），视图层（V - View），中间层（C/P/VM - Controller/Presenter/View Model）构成。</p>
+</blockquote>
+<p>三种架构的比较：</p>
+<ul>
+<li><p>1.<b>模型层几乎相同</b>。三种架构的模型理论来说都是数据来源，没有什么不同。</p>
+</li>
+<li><p>2.<b>视图层理论上都设计为被动，但是实际上略有不同</b>。实际开发中 MVC 中视图层与中间层高度耦合，几乎所有的操作都统一由 ViewController 包办。 但理论上来说，MVC 是希望视图层就是单纯的 UIView，或者 UIViewController 只负责 UI 更新交互，不涉及业务逻辑和模型更新。 MVP 和 MVVM 在实际开发中视图层实现了 MVC 理论期望，即与中间层严格分离。 MVP 中视图层是完全被动，单纯的把交互和更新传递给中间层；而 MVVM 中视图层并不是完全被动——它会监视中间层的变化，一旦产生变化，则视图层也会相应变化。</p>
+</li>
+<li><p>3.<b>中间层的设计是三种架构的核心的差异</b>。逻辑上讲，中间层的作用就是连接视图层和模型层。它处理交互、接受通知、完成数据更新。 MVC 的中间层 Controller 持有视图和模型，主要起到一个组装和连接的作用，通过传递参数和实例变量来直接完成所有操作。 MVP 的中间层 Presenter 持有模型，在更新模型上与 MVC 的 Controller 角色一样。但它不拥有视图，视图拥有中间层，中间层的工作流程是：从视图层接收交互传递-&gt;响应-&gt;向视图层传递响应指令-&gt;视图进行更新。全部操作必须手动书写代码完成。 MVVM 的中间层 View Model 持有模型，在更新模型上与前两者相同。它完全独立于视图，视图拥有中间层，通过绑定属性，自动进行更新。全部操作由响应式逻辑框架自动完成。</p>
+</li>
+<li><p>4.<b>MVC 耦合度很高，代码分配最不合理，维护和扩展成本最高</b>。但因为无需层级传递，所以代码总量最少，适合初学者理解和应用。</p>
+</li>
+<li><p>5.<b>MVP 和 MVVM 相似，耦合度和代码分配都比较合理，较易实现高测试覆盖率</b>。MVP 的缺点是视图层需要将所有的交互传递给中间层，且要手动实现响应和更新，所以总代码量远超 MVVM。MVVM 在响应和更新上通过响应式框架自动操作，大大精简了代码量；但是需要引入第三方响应式框架，同时因为属性观察环环相扣，调用栈很大，debug 起来尤为痛苦。</p>
+</li>
+<li><p>6.<b>MVC，MVP，MVVM 这三种结构都是以视图为驱动的架构，三种皆为用户交互和视图更新为主要服务目标</b>。它们一个共同的缺点是没有涉及界面之间的跳转——即路由的设计。</p>
+</li>
+</ul>
+<h3 id="6-最后还有一个-VIPER-由于没有用过，所以就不写了。-。"><a href="#6-最后还有一个-VIPER-由于没有用过，所以就不写了。-。" class="headerlink" title="6.最后还有一个 VIPER 由于没有用过，所以就不写了。-。-"></a>6.最后还有一个 VIPER 由于没有用过，所以就不写了。-。-</h3><blockquote>
+<p>以上。</p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+    <div>
+  
+    <div>
+
+    <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+  
+    </div>
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/other/" rel="tag"><i class="fa fa-tag"></i> other</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/22/iOS-多线程GCD封装/" rel="next" title="iOS 多线程GCD封装">
+                <i class="fa fa-chevron-left"></i> iOS 多线程GCD封装
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/29/iOS-项目结构/" rel="prev" title="iOS 项目结构与代码规范">
+                iOS 项目结构与代码规范 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2018/08/28/iOS项目架构的选择/"
+           data-title="iOS项目架构的选择" data-url="https://www.chuqingr.cn/2018/08/28/iOS项目架构的选择/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Yshao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/chuqingr" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#架构"><span class="nav-number">1.</span> <span class="nav-text">架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么要研究架构？"><span class="nav-number">1.1.</span> <span class="nav-text">为什么要研究架构？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#有哪些架构？"><span class="nav-number">1.2.</span> <span class="nav-text">有哪些架构？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-苹果官方的-MVC-架构"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.苹果官方的 MVC 架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-MVCS架构"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.MVCS架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-MVP-和-MVC-相比有什么异同？"><span class="nav-number">1.2.3.</span> <span class="nav-text">3. MVP 和 MVC 相比有什么异同？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-MVVM-中的-ViewModel-的作用是什么？"><span class="nav-number">1.2.4.</span> <span class="nav-text">4.MVVM 中的 ViewModel 的作用是什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-MVC，MVP，MVVM-三种架构的比较"><span class="nav-number">1.2.5.</span> <span class="nav-text">5.MVC，MVP，MVVM 三种架构的比较</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-最后还有一个-VIPER-由于没有用过，所以就不写了。-。"><span class="nav-number">1.2.6.</span> <span class="nav-text">6.最后还有一个 VIPER 由于没有用过，所以就不写了。-。-</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yshao</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

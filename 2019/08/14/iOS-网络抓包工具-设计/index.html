@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/head.jpg?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="目的写这个监控方案主要是为了方便做逆向的同学更加方便的获取抓包数据，解决一些平时无法抓包或者数据缺失的问题，看到更加完整的数据，减少逆向时踩坑的概率，挖掘更多的有用数据，同时也方便一些非开发的同学进行抓包（最后点主要是安卓同学会受益，这次方案有两个版本（ios和安卓），因为使用的问题，iOS版本目前对普通的同学还不是很友好，安卓目前解决了这个问题），同时也希望有知道的同学能给我提供一个更好的解决方">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS 网络抓包工具 设计">
+<meta property="og:url" content="https://www.chuqingr.cn/2019/08/14/iOS-网络抓包工具-设计/index.html">
+<meta property="og:site_name" content="Yshao的个人博客">
+<meta property="og:description" content="目的写这个监控方案主要是为了方便做逆向的同学更加方便的获取抓包数据，解决一些平时无法抓包或者数据缺失的问题，看到更加完整的数据，减少逆向时踩坑的概率，挖掘更多的有用数据，同时也方便一些非开发的同学进行抓包（最后点主要是安卓同学会受益，这次方案有两个版本（ios和安卓），因为使用的问题，iOS版本目前对普通的同学还不是很友好，安卓目前解决了这个问题），同时也希望有知道的同学能给我提供一个更好的解决方">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.chuqingr.cn/2019/08/14/iOS-网络抓包工具-设计/111.png">
+<meta property="og:image" content="https://www.chuqingr.cn/2019/08/14/iOS-网络抓包工具-设计/222.png">
+<meta property="og:image" content="https://www.chuqingr.cn/2019/08/14/iOS-网络抓包工具-设计/333.jpg">
+<meta property="og:updated_time" content="2019-08-28T12:56:51.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS 网络抓包工具 设计">
+<meta name="twitter:description" content="目的写这个监控方案主要是为了方便做逆向的同学更加方便的获取抓包数据，解决一些平时无法抓包或者数据缺失的问题，看到更加完整的数据，减少逆向时踩坑的概率，挖掘更多的有用数据，同时也方便一些非开发的同学进行抓包（最后点主要是安卓同学会受益，这次方案有两个版本（ios和安卓），因为使用的问题，iOS版本目前对普通的同学还不是很友好，安卓目前解决了这个问题），同时也希望有知道的同学能给我提供一个更好的解决方">
+<meta name="twitter:image" content="https://www.chuqingr.cn/2019/08/14/iOS-网络抓包工具-设计/111.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.chuqingr.cn/2019/08/14/iOS-网络抓包工具-设计/"/>
+
+
+
+
+
+  <title>iOS 网络抓包工具 设计 | Yshao的个人博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+    <a href="https://github.com/chuqingr" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#64CEAA; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yshao的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">学海无涯苦作舟</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.chuqingr.cn/2019/08/14/iOS-网络抓包工具-设计/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yshao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yshao的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS 网络抓包工具 设计</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-14T19:41:02+08:00">
+                2019-08-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/08/14/iOS-网络抓包工具-设计/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/08/14/iOS-网络抓包工具-设计/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>写这个监控方案主要是为了方便做逆向的同学更加方便的获取抓包数据，解决一些平时无法抓包或者数据缺失的问题，看到更加完整的数据，减少逆向时踩坑的概率，挖掘更多的有用数据，同时也方便一些非开发的同学进行抓包（最后点主要是安卓同学会受益，这次方案有两个版本（ios和安卓），因为使用的问题，iOS版本目前对普通的同学还不是很友好，安卓目前解决了这个问题），同时也希望有知道的同学能给我提供一个更好的解决方案。<br><a id="more"></a></p>
+<h2 id="抓包工具现状"><a href="#抓包工具现状" class="headerlink" title="抓包工具现状"></a>抓包工具现状</h2><p>主要以charles为例，wireshark使用起来并不是十分的友好，无法直接看见明文数据。</p>
+<ul>
+<li>下列出几点iOS无法抓包的情形</li>
+</ul>
+<blockquote>
+<ul>
+<li>1.APP内存在证书校验的数据</li>
+<li>2.经过SPDY优化处理的数据</li>
+<li>3.存在代理校验的APP无法抓包</li>
+<li>4.iOS WKwebview的数据无法获取</li>
+<li>5.它不受系统的配置影响，不走苹果自身的代理转发机制的请求</li>
+</ul>
+</blockquote>
+<p>这里针对如何第二点做一个补充。之前在测试抓取闲鱼芝麻信用的数据接口时发现，此处的接口通过多种方式都无法获取，最终通过在偶然的巧合下，发现电脑端开启全局vpn时，然后再通过charles（需要开启sockets proxy）,才能有大概率抓到包（不是100%），基于各种情况判断，可能是网络延迟的问题导致，蚂蚁的SPDY中可能要基于网络的判定，会导致无法触发他的SPDY协议（还未实锤）。<br>其他的情景还需要其他的同学继续提供无法抓包的情景以完善这个工具方案。</p>
+<p>第五点目前只能具体 情况具体分析，很难做到统一化，因为不知道具体是采用的什么机制。</p>
+<h3 id="SPDY"><a href="#SPDY" class="headerlink" title="SPDY"></a>SPDY</h3><p>这里简单的解释一下SPDY。需要详细了解的同学，iOS端的开源项目可以研究一下 <a href="https://github.com/twitter/CocoaSPDY" target="_blank" rel="noopener">CocoaSPDY</a></p>
+<p>目前关于HTTP2.0主要基于SPDY协议<br>为了使HTTP请求更快，SPDY进行了一些改进：</p>
+<blockquote>
+</blockquote>
+<ul>
+<li>1.请求多路复用。SPDY不是通过一个TCP连接一次发送一个请求，而是可以通过单个TCP会话同时发出许多请求，并且只要它们可用就以任何顺序处理响应。</li>
+<li>2.SPDY压缩请求和响应头。在请求之间，标题通常几乎相同，通常包含大量重复的文本，并且可能非常大。</li>
+<li>3.SPDY引入了服务器推送。这可以允许服务器推送客户端不知道它需要的内容。此类内容的范围可以从样式和图像等附加资产到有关实时事件的通知。</li>
+</ul>
+<h2 id="抓包工具方案："><a href="#抓包工具方案：" class="headerlink" title="抓包工具方案："></a>抓包工具方案：</h2><p><img src="/2019/08/14/iOS-网络抓包工具-设计/111.png" alt=""></p>
+<p>整体流程设计如上，通过抓包工具获取相关数据，将数据保存在本地，将手机作为一个server。网页端通过http请求，获取本地的抓包数据，进行展示，同时也支持了本地展示，支持请求的重放，请求数据持久化等功能。</p>
+<p>采用本机server，是为了减少集成的难度，减少对后台人员的依赖，减少跨域问题，避免了使用服务器带来的成本，减少了部署的问题。</p>
+<h2 id="iOS-网络监控方案"><a href="#iOS-网络监控方案" class="headerlink" title="iOS 网络监控方案"></a>iOS 网络监控方案</h2><p><img src="/2019/08/14/iOS-网络抓包工具-设计/222.png" alt=""></p>
+<p>由上图可以看出目前iOS的网络编程分四层：</p>
+<ul>
+<li>WebKit：属于Cocoa层，苹果很多地方用到的页面渲染引擎WKWebview；</li>
+<li>NSURL：属于Cocoa层，对各类URL请求的封装(NSURLRequest)；</li>
+<li>CFNetwork：属于Core Foundation层，基于C的封装，同样的还有CFNetServices(write/readstream)；</li>
+<li>BSD sockets：属于OS层，也是基于C的封装；</li>
+</ul>
+<p>这只是网络编程的抽象层级，并不是ios的调用层级关系。这里和我们网络监控方案的关系比较大。因为不是往上调用的关系，所以需要每个层级都进行监控才能实现全网络的监控。目前监控方案也只兼容了上面3层的网络请求（目前还没有发现使用CFNetwork的应用，有发现的同学可以告诉我一下 进行实际效果的测试）。</p>
+<p>基于层级关系，iOS 提供了3种 API 的编程方式。因为web层级是系统调用的，并没有开放相关的 API。</p>
+<h3 id="socket-方式"><a href="#socket-方式" class="headerlink" title="socket 方式"></a>socket 方式</h3><p>iOS 提供的socket方式的网络编程接口为CFSocket。CFSocket是BSD sockets的抽象和封装，CFSocket提供BSD sockets几乎所有的功能，并与runloop集成，用来实现多线程网络编程和网络事件监听。基于 CFSocket可以实现各种类型的 socket编程，包括stream-based 的sockets(如tcp)和packet-based 的sockets(如udp)。</p>
+<h3 id="stream-方式"><a href="#stream-方式" class="headerlink" title="stream 方式"></a>stream 方式</h3><p>stream编程模式提供了与unix的文件操作类似的模式。首先创建和设置流，接着打开流，然后读写流，在流存在时还可以通过查询流的相关属性来读取流的相关信息，在流使用完毕后关闭流。</p>
+<p>iOS 为stream编程模式提供的api编程接口包括两大类，</p>
+<p>一类是Core Foundation框架层用C语言实现的CFStream API（包括CFStream、 CFReadStream 、CFWriteStream等）,</p>
+<p>一类是基于其上的在Foundation框架层用Objective-C语言实现的NSStream API（包括NSStream、NSInputStream NSOutputStream等）,两者提供相似的接口和行为，其中某些对象是toll-free bridged类型的，如CFStream 与NSStream，CFReadStream与NSInputStream，CFWriteStream与NSOutputStream之间，因此可以混合使用，只要进行桥接即可。</p>
+<h3 id="url-方式"><a href="#url-方式" class="headerlink" title="url 方式"></a>url 方式</h3><p>url 编程模式通过URL 的方式来实现网络编程，任何要存取的网络资源（包括局域网和广域网）都可以用一个URL来表示和存取，并支持设备间的资源共享。url 编程模式系统提供http, https, file, ftp, data等五种协议支持，并允许用户自己开发和登记相关类来支持另外的应用层网络协议，进行协议的扩展。</p>
+<p>url 编程模式在IOS系统可以使用两种编程接口：NSURLSession 和NSURLConnection。</p>
+<h3 id="监控方案"><a href="#监控方案" class="headerlink" title="监控方案"></a>监控方案</h3><p>网络监控一般通过和代码注入（Hook）这两种方式来实现，由于 NSURLProtocol 作为上层接口，又能够直接获取webview的相关请求，使用起来更为方便（实际会存在一些小问题，后面会详细描述），因此很自然选择它作为网络监控的首选切入点，但是 NSURLProtocol 属于 URL Loading System 体系中，所以存在一定的局限性，无法完全覆盖所有的网络请求。CFNetwork则还是需要利用 fishhook 进行额外的处理。</p>
+<p><img src="/2019/08/14/iOS-网络抓包工具-设计/333.jpg" alt=""></p>
+<h3 id="NSURLProtocol"><a href="#NSURLProtocol" class="headerlink" title="NSURLProtocol"></a>NSURLProtocol</h3><p>NSURLProtocol这个类我们不能直接使用，我们需要自己创建一个子类然后去注册这个子类</p>
+<p>[NSURLProtocol registerClass:[ZCNetEye class]];<br>在这个类中我们可以拦截到请求，然后进行处理。这个类中有几个非常重要的方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">+ (BOOL)canInitWithRequest:(NSURLRequest *)request;</span><br></pre></td></tr></table></figure>
+<p>通过返回值来告诉NSUrlProtocol对进来的请求是否拦截，比如我只拦截HTTP的，或者是某个域名的请求之类。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">+ (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request;</span><br></pre></td></tr></table></figure>
+<p>如果上面的方法返回YES那么request会传到这里，这个地方通常不做处理 直接返回request</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (void)startLoading;</span><br></pre></td></tr></table></figure>
+<p>你可以在 - startLoading 中使用任何方法来对协议对象持有的 request 进行转发，包括 NSURLSession、 NSURLConnection 甚至使用 AFNetworking 等网络库，只要你能在回调方法中把数据传回 client，帮助其正确渲染就可以，比如这样：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition))completionHandler &#123;</span><br><span class="line">    [[self client] URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageAllowed];</span><br><span class="line">    </span><br><span class="line">    completionHandler(NSURLSessionResponseAllow);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data &#123;</span><br><span class="line">    [[self client] URLProtocol:self didLoadData:data];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>实际上我们做监控的话不需要进行转发，这里可以忽略，我们只需要保存 request 或者读取里面的相关数据就可以。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (void)stopLoading;</span><br></pre></td></tr></table></figure>
+<p>请求完毕后调用,这里我们可以获取到response，然后和保存的request进行匹配，得到一个完整的请求。</p>
+<h4 id="踩坑点1"><a href="#踩坑点1" class="headerlink" title="踩坑点1"></a>踩坑点1</h4><p>系统中可能会存在多个NSUrlProtocol的子类，iOS的规则是后注册的先进入，一旦某个请求，在这里先被取消了，那么后续的其他子类将无法接受到这个请求。这也是SPDY的特殊处理，会在这里进行，取消请求，然后进行网络优化。</p>
+<p>可以利用Method Swizzling hook registerClass 这个方法。一旦有其他协议进行注册，可以先取消自己的Protocol，再重新注册一次。</p>
+<h4 id="踩坑点2"><a href="#踩坑点2" class="headerlink" title="踩坑点2"></a>踩坑点2</h4><p>在NSURLProtocol中取request.HTTPBody得到的是nil，并不是因为body真的被NSURLProtocol抛弃了之类的，可以看到发出去的请求还是正常带着body的。这也不是苹果的bug，只是body数据在URL loading system中到达这里之前就已经被转成stream了,可以在request.HTTPBodyStream中解析它。</p>
+<p>这里附上解析的代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">NSInteger maxLength = 2048;</span><br><span class="line">uint8_t d[maxLength];</span><br><span class="line"></span><br><span class="line">//返回实际装的字节数</span><br><span class="line">NSInputStream *stream = request.HTTPBodyStream;</span><br><span class="line">[stream open];</span><br><span class="line"></span><br><span class="line">//把字节数组转化成data</span><br><span class="line">NSMutableData *data = [[NSMutableData alloc] init];</span><br><span class="line">BOOL endOfStreamReached = NO;</span><br><span class="line">while (!endOfStreamReached) &#123;</span><br><span class="line">    NSInteger bytesRead = [stream read:d maxLength:maxLength];</span><br><span class="line">    if (bytesRead == 0) &#123; //文件读取到最后</span><br><span class="line">        endOfStreamReached = YES;</span><br><span class="line">    &#125; else if (bytesRead == -1) &#123; //文件读取错误</span><br><span class="line">        endOfStreamReached = YES;</span><br><span class="line">    &#125; else if (stream.streamError == nil) &#123;</span><br><span class="line">        [data appendBytes:(void *)d length:bytesRead];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//转成可见字符串</span><br><span class="line">NSString *recStr =[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];</span><br></pre></td></tr></table></figure>
+<h4 id="踩坑点3"><a href="#踩坑点3" class="headerlink" title="踩坑点3"></a>踩坑点3</h4><p>到目前为止他可以拦截所有基于URL Loading System 中的请求，但是对于WKWebview里面所发出的请求即使他是http/https 也无能为力。需要单独的进行处理。</p>
+<p>WKwebview的源码和原理，我们可以参考这篇文章NSURLProtocol对WKWebView的处理.</p>
+<p>通过文章我们可以知道WKWebview还是会走NSURLProtocol，只是会进行过滤。</p>
+<p>创建一个NSURLProtocol的分类就能解决这个问题。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">FOUNDATION_STATIC_INLINE Class ContextControllerClass() &#123;</span><br><span class="line">    static Class cls;</span><br><span class="line">    if (!cls) &#123;</span><br><span class="line">        cls = [[[WKWebView new] valueForKey:@&quot;browsingContextController&quot;] class];</span><br><span class="line">    &#125;</span><br><span class="line">    return cls;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">FOUNDATION_STATIC_INLINE SEL RegisterSchemeSelector() &#123;</span><br><span class="line">    return NSSelectorFromString(@&quot;registerSchemeForCustomProtocol:&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">FOUNDATION_STATIC_INLINE SEL UnregisterSchemeSelector() &#123;</span><br><span class="line">    return NSSelectorFromString(@&quot;unregisterSchemeForCustomProtocol:&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@implementation NSURLProtocol (WebKitSupport)</span><br><span class="line"></span><br><span class="line">+ (void)wk_registerScheme:(NSString *)scheme &#123;</span><br><span class="line">    Class cls = ContextControllerClass();</span><br><span class="line">    SEL sel = RegisterSchemeSelector();</span><br><span class="line">    if ([(id)cls respondsToSelector:sel]) &#123;</span><br><span class="line">        // 放弃编辑器警告</span><br><span class="line">#pragma clang diagnostic push</span><br><span class="line">#pragma clang diagnostic ignored &quot;-Warc-performSelector-leaks&quot;</span><br><span class="line">        [(id)cls performSelector:sel withObject:scheme];</span><br><span class="line">#pragma clang diagnostic pop</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">+ (void)wk_unregisterScheme:(NSString *)scheme &#123;</span><br><span class="line">    Class cls = ContextControllerClass();</span><br><span class="line">    SEL sel = UnregisterSchemeSelector();</span><br><span class="line">    if ([(id)cls respondsToSelector:sel]) &#123;</span><br><span class="line">        // 放弃编辑器警告</span><br><span class="line">#pragma clang diagnostic push</span><br><span class="line">#pragma clang diagnostic ignored &quot;-Warc-performSelector-leaks&quot;</span><br><span class="line">        [(id)cls performSelector:sel withObject:scheme];</span><br><span class="line">#pragma clang diagnostic pop</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在注册NSURLProtocol的时候顺便执行这两行代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[NSURLProtocol wk_unregisterScheme:@&quot;http&quot;];</span><br><span class="line">[NSURLProtocol wk_unregisterScheme:@&quot;https&quot;];</span><br></pre></td></tr></table></figure>
+<p>但是下面调用的是私有方法，如果上架的应用想植入一下代码就需要去隐藏这个部分的字符串。</p>
+<p>这里提供一种隐藏字符串的方式</p>
+<p>采用这样的方式,这些字符不会进入字符常量区，编译器直接换算成异或结果。这也是一种安全的隐藏系统中关键的加密字符串的方法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">static NSString * AES_KEYINFO()&#123;</span><br><span class="line">    </span><br><span class="line">    unsigned char key[]=&#123;</span><br><span class="line">        (STRING_ENCRYPT_KEY ^ &apos;z&apos;),</span><br><span class="line">        (STRING_ENCRYPT_KEY ^ &apos;i&apos;),</span><br><span class="line">        (STRING_ENCRYPT_KEY ^ &apos;c&apos;),</span><br><span class="line">        (STRING_ENCRYPT_KEY ^ &apos;m&apos;),</span><br><span class="line">        (STRING_ENCRYPT_KEY ^ &apos;a&apos;),</span><br><span class="line">        (STRING_ENCRYPT_KEY ^ &apos;g&apos;),</span><br><span class="line">        (STRING_ENCRYPT_KEY ^ &apos;i&apos;),</span><br><span class="line">        (STRING_ENCRYPT_KEY ^ &apos;c&apos;),</span><br><span class="line">        (STRING_ENCRYPT_KEY ^ &apos;\0&apos;)</span><br><span class="line">    &#125;;</span><br><span class="line">    unsigned char * p = key;</span><br><span class="line">    while (((*p) ^= STRING_ENCRYPT_KEY) != &apos;\0&apos;) p++;</span><br><span class="line"> </span><br><span class="line">    return [NSString stringWithUTF8String:(const char *)key];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="踩坑点4"><a href="#踩坑点4" class="headerlink" title="踩坑点4"></a>踩坑点4</h4><p>到点3为止，我们获取到的数据基本上已经和chales相同或者，领先他了，但是会少一些的cookie信息。需要我们从系统中获取，然后进行匹配。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">NSString *host = self.zc_request.URL.host;</span><br><span class="line">NSArray *cookieArray = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies];</span><br><span class="line">NSMutableArray *cookieValueArray = [NSMutableArray array];</span><br><span class="line">for (NSHTTPCookie *cookie in cookieArray) &#123;</span><br><span class="line">    NSString *domain = [cookie.properties valueForKey:NSHTTPCookieDomain];</span><br><span class="line">    NSRange range = [host rangeOfString:domain];</span><br><span class="line">    NSComparisonResult result = [cookie.expiresDate compare:[NSDate date]];</span><br><span class="line">    </span><br><span class="line">    if(range.location != NSNotFound &amp;&amp; result == NSOrderedDescending)</span><br><span class="line">    &#123;</span><br><span class="line">        [cookieValueArray addObject:[NSString stringWithFormat:@&quot;%@:%@&quot;,cookie.name,cookie.value]];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>CFNetwork<br>这里简单的描述一下CFNetwork的流程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">	//创建URL</span><br><span class="line">    CFURLRef theURL = CFURLCreateWithString(kCFAllocatorDefault, CFSTR(&quot;http://10.57.244.171:1203/query_packets&quot;), NULL);</span><br><span class="line">    //创建Message 可以类比为request</span><br><span class="line">    CFHTTPMessageRef requestMessage = CFHTTPMessageCreateRequest(kCFAllocatorDefault, CFSTR(&quot;GET&quot;), theURL, kCFHTTPVersion1_1);</span><br><span class="line">    //设置请求头</span><br><span class="line">    CFHTTPMessageSetHeaderFieldValue(requestMessage,CFSTR(&quot;testKey&quot;) , CFSTR(&quot;testValue&quot;));</span><br><span class="line"></span><br><span class="line">//	  post请求会使用以下的方法 设置请求体</span><br><span class="line">//    NSString *dataStr = @&quot;dattadadad&quot;;</span><br><span class="line">//    NSData *bodyData = [dataStr dataUsingEncoding:NSUTF8StringEncoding];</span><br><span class="line">//    CFHTTPMessageSetBody(requestMessage , (__bridge_retained CFDataRef)bodyData);</span><br><span class="line"></span><br><span class="line">    CFRelease(theURL);</span><br><span class="line">    //创建数据流，这个其实就是response，在服务器数据返回的时候，才会真实的调用。</span><br><span class="line">    CFReadStreamRef readStream = CFReadStreamCreateForHTTPRequest(kCFAllocatorDefault, requestMessage);</span><br><span class="line">    CFRelease(requestMessage);</span><br><span class="line">    </span><br><span class="line">    //加入到runloop中 </span><br><span class="line">    CFReadStreamScheduleWithRunLoop(readStream, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);</span><br><span class="line">    </span><br><span class="line">    CFOptionFlags flags = (kCFStreamEventHasBytesAvailable | kCFStreamEventErrorOccurred | kCFStreamEventEndEncountered);</span><br><span class="line">    CFStreamClientContext context = &#123;0, NULL, NULL, NULL, NULL&#125;;</span><br><span class="line">    //设置Client </span><br><span class="line">    CFReadStreamSetClient(readStream, flags, GetRequestCallBack, &amp;context);</span><br><span class="line">    CFReadStreamOpen(readStream);</span><br></pre></td></tr></table></figure>
+<p>从CF的请求过程中可以发现 CFReadStreamCreateForHTTPRequest 是我们需要的一部，这里我们可以得到CFHTTPMessageRef，也能直接获取CFReadStreamRef。这样一个完整的请求就直接能拿到了。剩下的就是解析，这部分的数据。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//从请求中获取方法</span><br><span class="line">CFStringRef httpMethod = CFHTTPMessageCopyRequestMethod(request);</span><br><span class="line">//从请求中获取请求头 </span><br><span class="line">CFDictionaryRef requestHeader = CFHTTPMessageCopyAllHeaderFields(request);</span><br><span class="line">//从请求中获取请求体，这里是流数据需要单独的解析。</span><br><span class="line">CFDataRef requestBody = CFHTTPMessageCopyBody(request);</span><br><span class="line">//获取请求状态</span><br><span class="line">CFIndex statusCode = CFHTTPMessageGetResponseStatusCode(request);</span><br><span class="line">CF网上的资料非常少，虽然最后的结果非常的简单，但是iOS的不开源，一些细节地方还是花了很多时间去研究。</span><br></pre></td></tr></table></figure>
+<p>目前只测试了自己发起的网络请求的拦截，实际上还没有找到市面上，是用CFNetwork写的APP，有知道的小伙伴可以提供一下。</p>
+<h3 id="android-网络监控方案"><a href="#android-网络监控方案" class="headerlink" title="android 网络监控方案"></a>android 网络监控方案</h3><p>图片4</p>
+<h3 id="Web端实现方案"><a href="#Web端实现方案" class="headerlink" title="Web端实现方案"></a>Web端实现方案</h3><p>工具的使用<br>iOS<br>iOS端的使用，只需要在MonkeyDev的工程中，拖入工程和web资源包，运行成功后即成功注入APP。</p>
+<p>越狱设备可通过DYLD_INSERT_LIBRARIES函数注入插件。</p>
+<p>运行后，摇一摇会出现，本机展示页面，和web页的链接，PC端输入链接则可以直接查看相关数据。</p>
+<p>android<br>安卓只需要安装apk的包即可使用，以一个单独的app形式存在，打开app有相应的web地址和APP列表，可以选择相应的app进行监控。</p>
+
+      
+    </div>
+    
+    
+    
+    <div>
+  
+    <div>
+
+    <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+  
+    </div>
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/18/WhatsApp-分析/" rel="next" title="WhatsApp 分析">
+                <i class="fa fa-chevron-left"></i> WhatsApp 分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/09/03/AirPlay-自投屏-技术分析/" rel="prev" title="AirPlay 自投屏 技术分析">
+                AirPlay 自投屏 技术分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2019/08/14/iOS-网络抓包工具-设计/"
+           data-title="iOS 网络抓包工具 设计" data-url="https://www.chuqingr.cn/2019/08/14/iOS-网络抓包工具-设计/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Yshao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/chuqingr" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#目的"><span class="nav-number">1.</span> <span class="nav-text">目的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#抓包工具现状"><span class="nav-number">2.</span> <span class="nav-text">抓包工具现状</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SPDY"><span class="nav-number">2.1.</span> <span class="nav-text">SPDY</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#抓包工具方案："><span class="nav-number">3.</span> <span class="nav-text">抓包工具方案：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#iOS-网络监控方案"><span class="nav-number">4.</span> <span class="nav-text">iOS 网络监控方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#socket-方式"><span class="nav-number">4.1.</span> <span class="nav-text">socket 方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#stream-方式"><span class="nav-number">4.2.</span> <span class="nav-text">stream 方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#url-方式"><span class="nav-number">4.3.</span> <span class="nav-text">url 方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#监控方案"><span class="nav-number">4.4.</span> <span class="nav-text">监控方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NSURLProtocol"><span class="nav-number">4.5.</span> <span class="nav-text">NSURLProtocol</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#踩坑点1"><span class="nav-number">4.5.1.</span> <span class="nav-text">踩坑点1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#踩坑点2"><span class="nav-number">4.5.2.</span> <span class="nav-text">踩坑点2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#踩坑点3"><span class="nav-number">4.5.3.</span> <span class="nav-text">踩坑点3</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#踩坑点4"><span class="nav-number">4.5.4.</span> <span class="nav-text">踩坑点4</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#android-网络监控方案"><span class="nav-number">4.6.</span> <span class="nav-text">android 网络监控方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Web端实现方案"><span class="nav-number">4.7.</span> <span class="nav-text">Web端实现方案</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yshao</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

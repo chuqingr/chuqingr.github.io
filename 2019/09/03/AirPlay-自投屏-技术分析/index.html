@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/head.jpg?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="airPlay 简介AirPlay是苹果公司的在iOS4.2及OS X Mountain Lion中加入的一种播放技术，可以将iPhone、iPod touch、iPad及Mac（需要OS X Mountain Lion）上的视频镜像传送到支持Airplay的设备（如：音箱、Apple TV)中播放。使用Airplay需要iOS4.2版本的设备或Mac电脑上的iTunes10.1以上版本。视频镜像">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AirPlay 自投屏 技术分析">
+<meta property="og:url" content="https://www.chuqingr.cn/2019/09/03/AirPlay-自投屏-技术分析/index.html">
+<meta property="og:site_name" content="Yshao的个人博客">
+<meta property="og:description" content="airPlay 简介AirPlay是苹果公司的在iOS4.2及OS X Mountain Lion中加入的一种播放技术，可以将iPhone、iPod touch、iPad及Mac（需要OS X Mountain Lion）上的视频镜像传送到支持Airplay的设备（如：音箱、Apple TV)中播放。使用Airplay需要iOS4.2版本的设备或Mac电脑上的iTunes10.1以上版本。视频镜像">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-09-09T08:40:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AirPlay 自投屏 技术分析">
+<meta name="twitter:description" content="airPlay 简介AirPlay是苹果公司的在iOS4.2及OS X Mountain Lion中加入的一种播放技术，可以将iPhone、iPod touch、iPad及Mac（需要OS X Mountain Lion）上的视频镜像传送到支持Airplay的设备（如：音箱、Apple TV)中播放。使用Airplay需要iOS4.2版本的设备或Mac电脑上的iTunes10.1以上版本。视频镜像">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.chuqingr.cn/2019/09/03/AirPlay-自投屏-技术分析/"/>
+
+
+
+
+
+  <title>AirPlay 自投屏 技术分析 | Yshao的个人博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+    <a href="https://github.com/chuqingr" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#64CEAA; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yshao的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">学海无涯苦作舟</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.chuqingr.cn/2019/09/03/AirPlay-自投屏-技术分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yshao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yshao的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">AirPlay 自投屏 技术分析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-03T13:45:33+08:00">
+                2019-09-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/09/03/AirPlay-自投屏-技术分析/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/09/03/AirPlay-自投屏-技术分析/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="airPlay-简介"><a href="#airPlay-简介" class="headerlink" title="airPlay 简介"></a>airPlay 简介</h2><p>AirPlay是苹果公司的在iOS4.2及OS X Mountain Lion中加入的一种播放技术，可以将iPhone、iPod touch、iPad及Mac（需要OS X Mountain Lion）上的视频镜像传送到支持Airplay的设备（如：音箱、Apple TV)中播放。使用Airplay需要iOS4.2版本的设备或Mac电脑上的iTunes10.1以上版本。视频镜像则需要iOS 5及OS X Mountain Lion。                                    ——百度百科<br><a id="more"></a></p>
+<h2 id="airPlay-能做什么"><a href="#airPlay-能做什么" class="headerlink" title="airPlay 能做什么"></a>airPlay 能做什么</h2><p>airPlay 可以把手机屏幕投影到能接收 airPlay 镜像的设备上，例如国内的一些 电视，可以直接用 airPlay 完成手机投屏，然而 airPlay 是苹果独有的技术，且不是开源的，虽然国内有很多电视都支持这个功能，但是这些也都是破解的苹果的 airPlay 得到的。本文是在 iOS 的项目中 开启 airPlay 的镜像服务，可以使用其他的 iOS 设备连接这个 服务，也可以直接使用本机，连接本机上的服务，即：server 和 client 是同一个 iOS 设备。每个iOS设备，都是自带client的，所以这里主要讲的是如何实现 server 。主要是实现 airPlay 协议。</p>
+<h2 id="airPlay-协议的构成"><a href="#airPlay-协议的构成" class="headerlink" title="airPlay 协议的构成"></a>airPlay 协议的构成</h2><blockquote>
+<ul>
+<li>Multicast DNS (aka Bonjour) 用于发布服务, 启动后, 在iOS的控制中心菜单中就能看到对应的设备</li>
+<li>HTTP / RTSP / RTP 用于流媒体服务, 传输音视频数据, 进行播放控制等</li>
+<li>NTP 时间同步</li>
+<li>FairPlay DRM加密 完全私有的加密协议</li>
+</ul>
+</blockquote>
+<h2 id="airPlay-协议的难点"><a href="#airPlay-协议的难点" class="headerlink" title="airPlay 协议的难点"></a>airPlay 协议的难点</h2><h3 id="1-Airplay-协议文档缺失"><a href="#1-Airplay-协议文档缺失" class="headerlink" title="1.Airplay 协议文档缺失"></a>1.Airplay 协议文档缺失</h3><blockquote>
+<p>AirPlay 是 Apple 的私有协议簇, 没有公开的官方文档作为参考. 目前能够参考的是 github 上 nto 大神整理的一份非官方的协议 spec 文档, 但是完全照着文档的描述是无法兼容新的iOS系统(iOS9/10/11/12/13)的, 新系统对协议有改变,而这份文档的最后更新日期是2012年, 这些变更内容都没有包含。</p>
+</blockquote>
+<h3 id="2-Airplay-敏感数据加密的破解（fairPlay）"><a href="#2-Airplay-敏感数据加密的破解（fairPlay）" class="headerlink" title="2. Airplay 敏感数据加密的破解（fairPlay）"></a>2. Airplay 敏感数据加密的破解（fairPlay）</h3><blockquote>
+<p>有人会说Airplay毕竟是通过网络交互的协议, 当年 nto 能够整理出一份spec, 现在也可以通过抓包, 分析的方式得到新的交互过程, 缺少了文档不过是增加一些破解协议的难度而已. 但是以保护用户隐私著称的Apple, 不会明文传输音视频数据的. Airplay协议中有着比较完善的DRM保护, 传输的音视频都是用AES算法加密过的, 而 AES 的 key 则是在握手的过程中通过Fairplay协议保护的, 这一部分是Apple重点保护的内容, 目前没有人能真正破解。</p>
+</blockquote>
+<h2 id="FairPlay-握手建联"><a href="#FairPlay-握手建联" class="headerlink" title="FairPlay 握手建联"></a>FairPlay 握手建联</h2><p>建连握手部分是经过修改的RTSP协议, 与HTTP协议比较类似, 都是客户端(iOS系统)发起请求, 接收端针对请求内容进行回应的方式. 每个请求包括:方法+路径+header+content等内容。</p>
+<p>主要的交互过程如下:</p>
+<p>4次POST请求, 分别对应的路径为 /pair-setup, /pair-verify 和两次 /fp-setup 这是开头于FairPlay 相关的核心加密部分, 任何一次POST的回复内容不对都会导致握手失败。SETUP请求 不同版本的iOS系统中, SETUP方法的次数可能不同。</p>
+<p>在SETUP方法中能得到比较多的信息, 比如后面视频AES解密需要用到的 ekey 和 eiv. 接收端需要将自己的监听的接收端口 airVideoPort 回复给客户端.这些信息需要对这次请求的 content 使用 Apple 的Binary plist 格式进行解码才能提取, 回复内容也要编码为 Binary plist 格式. 后续完成握手后, 客户端会通过 airVideoPort 端口建立 TCP连接, 然后将屏幕画面通过H.264编码后再通过AES加密处理后, 向连接持续发送。</p>
+<p>一次GET请求, 路径为 /info, 这里接收端需要回复一个 Binary plist 格式的数据, 将用户配置的画面分辨率, 最大帧率等信息传递到客户端。</p>
+<p>可能有多次 GET_PARAMETER 和 SET_PARAMETER 请求用于调整音量大小。</p>
+<p>一次 RECORD 请求, 表明握手完成, airplay 镜像开始。</p>
+<p>在镜像过程中会每秒都收到 POST 请求,路径为 /feedback, 相当于心跳, 用于保持TCP的长连接。</p>
+<h4 id="未完待续"><a href="#未完待续" class="headerlink" title="未完待续"></a>未完待续</h4>
+      
+    </div>
+    
+    
+    
+    <div>
+  
+    <div>
+
+    <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+  
+    </div>
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/14/iOS-网络抓包工具-设计/" rel="next" title="iOS 网络抓包工具 设计">
+                <i class="fa fa-chevron-left"></i> iOS 网络抓包工具 设计
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/09/09/笔记/" rel="prev" title="笔记">
+                笔记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2019/09/03/AirPlay-自投屏-技术分析/"
+           data-title="AirPlay 自投屏 技术分析" data-url="https://www.chuqingr.cn/2019/09/03/AirPlay-自投屏-技术分析/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Yshao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/chuqingr" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#airPlay-简介"><span class="nav-number">1.</span> <span class="nav-text">airPlay 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#airPlay-能做什么"><span class="nav-number">2.</span> <span class="nav-text">airPlay 能做什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#airPlay-协议的构成"><span class="nav-number">3.</span> <span class="nav-text">airPlay 协议的构成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#airPlay-协议的难点"><span class="nav-number">4.</span> <span class="nav-text">airPlay 协议的难点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Airplay-协议文档缺失"><span class="nav-number">4.1.</span> <span class="nav-text">1.Airplay 协议文档缺失</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Airplay-敏感数据加密的破解（fairPlay）"><span class="nav-number">4.2.</span> <span class="nav-text">2. Airplay 敏感数据加密的破解（fairPlay）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FairPlay-握手建联"><span class="nav-number">5.</span> <span class="nav-text">FairPlay 握手建联</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#未完待续"><span class="nav-number">5.0.1.</span> <span class="nav-text">未完待续</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yshao</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

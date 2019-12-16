@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/head.jpg?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="swift," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="概述RxSwift响应式编程中，信号的种类较多，在合适的场景选择合适的信号，可以省很多的开销，变化符可以非常高效的帮助我们筛选我们需要的数据，是rxSwift重要的组成部分。">
+<meta name="keywords" content="swift">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RxSwift中的信号和变化符">
+<meta property="og:url" content="https://www.chuqingr.cn/2018/07/28/rxSwift中信号的区别/index.html">
+<meta property="og:site_name" content="Yshao的个人博客">
+<meta property="og:description" content="概述RxSwift响应式编程中，信号的种类较多，在合适的场景选择合适的信号，可以省很多的开销，变化符可以非常高效的帮助我们筛选我们需要的数据，是rxSwift重要的组成部分。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-08-30T04:34:52.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RxSwift中的信号和变化符">
+<meta name="twitter:description" content="概述RxSwift响应式编程中，信号的种类较多，在合适的场景选择合适的信号，可以省很多的开销，变化符可以非常高效的帮助我们筛选我们需要的数据，是rxSwift重要的组成部分。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.chuqingr.cn/2018/07/28/rxSwift中信号的区别/"/>
+
+
+
+
+
+  <title>RxSwift中的信号和变化符 | Yshao的个人博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+    <a href="https://github.com/chuqingr" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#64CEAA; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yshao的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">学海无涯苦作舟</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.chuqingr.cn/2018/07/28/rxSwift中信号的区别/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yshao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yshao的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">RxSwift中的信号和变化符</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-28T11:25:58+08:00">
+                2018-07-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/07/28/rxSwift中信号的区别/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/07/28/rxSwift中信号的区别/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>RxSwift响应式编程中，信号的种类较多，在合适的场景选择合适的信号，可以省很多的开销，变化符可以非常高效的帮助我们筛选我们需要的数据，是rxSwift重要的组成部分。<br><a id="more"></a></p>
+<h1 id="信号"><a href="#信号" class="headerlink" title="信号"></a>信号</h1><h2 id="Variable"><a href="#Variable" class="headerlink" title="Variable"></a>Variable</h2><blockquote>
+<p>Variable 其实就是对 BehaviorSubject 的封装，所以它也必须要通过一个默认的初始值进行创建。<br>         Variable 具有 BehaviorSubject 的功能，能够向它的订阅者发出上一个 event 以及之后新创建的 event。<br>         不同的是，Variable 还会把当前发出的值保存为自己的状态。同时它会在销毁时自动发送 .complete的 event，不需要也不能手动给 Variables 发送 completed或者 error 事件来结束它。<br>         简单地说就是 Variable 有一个 value 属性，我们改变这个 value 属性的值就相当于调用一般 Subjects 的 onNext() 方法，而这个最新的 onNext() 的值就被保存在 value 属性里了，直到我们再次修改它。<br>         Variables 本身没有 subscribe() 方法，但是所有 Subjects 都有一个 asObservable() 方法。我们可以使用这个方法返回这个 Variable 的 Observable 类型，拿到这个 Observable 类型我们就能订阅它了。<br>Variable要在接下来的版本里删除,请用BehaviorRelay代替.这里就不多做介绍了。</p>
+</blockquote>
+<h2 id="PublishSuject"><a href="#PublishSuject" class="headerlink" title="PublishSuject"></a>PublishSuject</h2><h3 id="Subject-订阅者也是observable"><a href="#Subject-订阅者也是observable" class="headerlink" title="Subject 订阅者也是observable"></a>Subject 订阅者也是observable</h3><blockquote>
+<ul>
+<li>1: 能动态地接受新的值</li>
+<li>2: subject有新的值的时候 通过event把新值发出给所有订阅者</li>
+</ul>
+</blockquote>
+<p>  PublishSuject<br>  PublishSubject是最普通的 Subject，它不需要初始值就能创建。<br>  订阅者从他们开始订阅的时间点起，可以收到订阅后 Subject 发出的新 Event，而不会收到他们在订阅前已发出的</p>
+<h2 id="BehaviorSubject"><a href="#BehaviorSubject" class="headerlink" title="BehaviorSubject"></a>BehaviorSubject</h2><blockquote>
+<ul>
+<li>1：BehaviorSubject 需要通过一个默认初始值来创建</li>
+<li>2：当一个订阅者来订阅它的时候，这个订阅者会立即收到 BehaviorSubjects 上一个发出的event。之后就跟正常的情况一样，它也会接收到 BehaviorSubject 之后发出的新的 event（这个地方正好弥补了PublishSubject 订阅之前发出信号无法监听的缺陷）</li>
+</ul>
+</blockquote>
+<h2 id="ReplaySubject"><a href="#ReplaySubject" class="headerlink" title="ReplaySubject"></a>ReplaySubject</h2><blockquote>
+<ul>
+<li>ReplaySubject 在创建时候需要设置一个 bufferSize，表示它对于它发送过的 event 的缓存个数。</li>
+</ul>
+</blockquote>
+<p>比如一个 ReplaySubject 的 bufferSize 设置为 2，它发出了 3 个 .next 的 event，那么它会将后两个（最近的两个）event 给缓存起来。此时如果有一个 subscriber 订阅了这个 ReplaySubject，那么这个 subscriber 就会立即收到前面缓存的两个.next 的 event。</p>
+<p>如果一个 subscriber 订阅已经结束的 ReplaySubject，除了会收到缓存的 .next 的 event外，还会收到那个终结的 .error 或者 .complete 的event。</p>
+<h2 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h2><p>PublishSubject、BehaviorSubject、ReplaySubject、Variable 区别:当一个新的订阅者刚订阅它的时候，能不能收到 Subject 以前发出过的旧 Event，如果能的话又能收到多少个</p>
+<h2 id="自定义的观察者序列（信号）"><a href="#自定义的观察者序列（信号）" class="headerlink" title="自定义的观察者序列（信号）"></a>自定义的观察者序列（信号）</h2><h3 id="通过指定的方法实现来自定义一个被观察的序列。"><a href="#通过指定的方法实现来自定义一个被观察的序列。" class="headerlink" title="通过指定的方法实现来自定义一个被观察的序列。"></a>通过指定的方法实现来自定义一个被观察的序列。</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">//just: 该方法通过传入一个默认值来初始化。</span></span><br><span class="line"> <span class="type">Observable</span>.just(<span class="string">"just"</span>)</span><br><span class="line">            .subscribe &#123; (event) <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(event)</span><br><span class="line">            &#125;</span><br><span class="line">            .disposed(by: disposeB)</span><br><span class="line">            </span><br><span class="line"> <span class="comment">//of: 该方法可以接受可变数量的参数（必需要是同类型的）</span></span><br><span class="line">        <span class="type">Observable</span>.of(<span class="string">"o"</span>,<span class="string">"f"</span>,<span class="string">"of"</span>)</span><br><span class="line">        	  .subscribe &#123; (event) <span class="keyword">in</span></span><br><span class="line">				   <span class="built_in">print</span>(event)</span><br><span class="line">            &#125;.disposed(by: disposeB)</span><br><span class="line">            </span><br><span class="line"><span class="comment">//from: 该方法需要一个数组参数。</span></span><br><span class="line">        <span class="type">Observable</span>.from([<span class="string">"f"</span>,<span class="string">"r"</span>,<span class="string">"o"</span>,<span class="string">"m"</span>])</span><br><span class="line">            .subscribe &#123; (event) <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(event)</span><br><span class="line">            &#125;.disposed(by: disposeB)</span><br><span class="line">            </span><br><span class="line"><span class="comment">//never : 该方法创建一个永远不会发出 Event（也不会终止）的 Observable 序列。</span></span><br><span class="line">        <span class="type">Observable</span>&lt;<span class="type">Int</span>&gt;.never()</span><br><span class="line">            .subscribe &#123; (event) <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(event)</span><br><span class="line">            &#125;.disposed(by: disposeB)</span><br><span class="line">            </span><br><span class="line"><span class="comment">//empty: 该方法创建一个空内容的 Observable 序列。 //会打印complete</span></span><br><span class="line">        <span class="type">Observable</span>&lt;<span class="type">Int</span>&gt;.empty()</span><br><span class="line">            .subscribe &#123; (event) <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(event)</span><br><span class="line">            &#125;.disposed(by: disposeB)</span><br><span class="line">            </span><br><span class="line"><span class="comment">//error: 该方法创建一个不做任何操作，而是直接发送一个错误的 Observable 序列。</span></span><br><span class="line">        <span class="keyword">let</span> myError = <span class="type">MyError</span>.<span class="type">A</span></span><br><span class="line">        <span class="type">Observable</span>&lt;<span class="type">Int</span>&gt;.error(myError)</span><br><span class="line">            .subscribe &#123; (event) <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(event)</span><br><span class="line">            &#125;.disposed(by: disposeB)</span><br><span class="line"></span><br><span class="line"><span class="comment">//该方法通过指定起始和结束数值，创建一个以这个范围内所有值作为初始值的Observable序列。</span></span><br><span class="line">        <span class="type">Observable</span>.range(start: <span class="number">1</span>, <span class="built_in">count</span>: <span class="number">6</span>)</span><br><span class="line">            .subscribe &#123; (event) <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(event)</span><br><span class="line">            &#125;.disposed(by: disposeB)</span><br><span class="line"></span><br><span class="line"><span class="comment">//repeatElement: 该方法创建一个可以无限发出给定元素的 Event的 Observable 序列（永不终止）。</span></span><br><span class="line">        <span class="type">Observable</span>.repeatElement(<span class="string">"Cooci"</span>)</span><br><span class="line">            .subscribe &#123; (event) <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(event)</span><br><span class="line">            &#125;.disposed(by: disposeB)</span><br><span class="line"></span><br><span class="line"><span class="comment">//generate: 该方法创建一个只有当提供的所有的判断条件都为 true 的时候，才会给出动作的 Observable 序列。</span></span><br><span class="line">        <span class="comment">//第一个参数:初始化的数值  第二个 条件  第三也是一个条件 0 + 2 &lt;= 10 依次循环下去,iterate:重复执行</span></span><br><span class="line">        <span class="type">Observable</span></span><br><span class="line">            .generate(initialState: <span class="number">0</span>, condition: &#123;$<span class="number">0</span>&lt;=<span class="number">10</span>&#125;, iterate: &#123;$<span class="number">0</span>+<span class="number">2</span>&#125;)</span><br><span class="line">            .subscribe &#123; (event) <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(event)</span><br><span class="line">            &#125;.disposed(by: disposeB)</span><br><span class="line">            </span><br><span class="line"><span class="comment">//上面和下面的效果一样</span></span><br><span class="line">        <span class="type">Observable</span>.of(<span class="number">0</span>,<span class="number">2</span>,<span class="number">4</span>,<span class="number">6</span>,<span class="number">8</span>,<span class="number">10</span>)</span><br><span class="line">            .subscribe &#123; (event) <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(event)</span><br><span class="line">            &#125;.disposed(by: disposeB)</span><br><span class="line">            </span><br><span class="line"><span class="comment">//deferred: 该个方法相当于是创建一个 Observable 工厂，通过传入一个 block 来执行延迟 Observable序列创建的行为，而这个 block 里就是真正的实例化序列对象的地方。</span></span><br><span class="line">        <span class="keyword">var</span> isOdd = <span class="literal">true</span></span><br><span class="line">        <span class="keyword">let</span> factory: <span class="type">Observable</span>&lt;<span class="type">Int</span>&gt; = <span class="type">Observable</span>.deferred &#123; () -&gt; <span class="type">Observable</span>&lt;<span class="type">Int</span>&gt; <span class="keyword">in</span></span><br><span class="line">            </span><br><span class="line">            isOdd = !isOdd</span><br><span class="line">            <span class="keyword">if</span> isOdd&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="type">Observable</span>.of(<span class="number">0</span>,<span class="number">2</span>,<span class="number">4</span>,<span class="number">6</span>,<span class="number">8</span>)</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="type">Observable</span>.of(<span class="number">1</span>,<span class="number">3</span>,<span class="number">5</span>,<span class="number">7</span>,<span class="number">9</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line"><span class="comment">//interval: 这个方法创建的 Observable 序列每隔一段设定的时间，会发出一个索引数的元素。而且它会一直发送下去。</span></span><br><span class="line">        <span class="type">Observable</span>&lt;<span class="type">Int</span>&gt;.interval(<span class="number">1</span>, scheduler: <span class="type">MainScheduler</span>.instance)</span><br><span class="line">            .subscribe &#123; (event) <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(event)</span><br><span class="line">            &#125;.disposed(by: disposeB)</span><br><span class="line">            </span><br><span class="line"><span class="comment">//timer: 这个方法有两种用法，一种是创建的 Observable序列在经过设定的一段时间后，产生唯一的一个元素。</span></span><br><span class="line">        <span class="type">Observable</span>&lt;<span class="type">Int</span>&gt;.timer(<span class="number">1</span>, scheduler: <span class="type">MainScheduler</span>.instance)</span><br><span class="line">            .subscribe&#123;(event) <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(<span class="string">"123"</span>,event)</span><br><span class="line">            &#125;.disposed(by: disposeB)</span><br><span class="line">        <span class="comment">//另一种是创建的 Observable 序列在经过设定的一段时间后，每隔一段时间产生一个元素。</span></span><br><span class="line">        <span class="type">Observable</span>&lt;<span class="type">Int</span>&gt;.timer(<span class="number">5</span>, period: <span class="number">1</span>, scheduler: <span class="type">MainScheduler</span>.instance)</span><br><span class="line">            .subscribe &#123; (event) <span class="keyword">in</span></span><br><span class="line">                <span class="built_in">print</span>(event)</span><br><span class="line">            &#125;.disposed(by: disposeB)</span><br></pre></td></tr></table></figure>
+<p>上面的自定义观察者序列后面的几种应用场景相对较窄，只需要知道有这么个操作就可以了。</p>
+<h1 id="变化符"><a href="#变化符" class="headerlink" title="变化符"></a>变化符</h1><h2 id="Filter"><a href="#Filter" class="headerlink" title="Filter"></a>Filter</h2><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//该操作符就是用来过滤掉某些不符合要求的事件。</span></span><br><span class="line"> <span class="type">Observable</span>.of(<span class="number">2</span>, <span class="number">30</span>, <span class="number">22</span>, <span class="number">5</span>, <span class="number">60</span>, <span class="number">3</span>, <span class="number">40</span> ,<span class="number">9</span>)</span><br><span class="line">            .<span class="built_in">filter</span> &#123;</span><br><span class="line">                $<span class="number">0</span> &gt; <span class="number">10</span></span><br><span class="line">            &#125;</span><br><span class="line">            .subscribe(onNext: &#123; <span class="built_in">print</span>($<span class="number">0</span>) &#125;)</span><br><span class="line">            .disposed(by: disposedB)</span><br></pre></td></tr></table></figure>
+<h2 id="DistinctUntilChanged"><a href="#DistinctUntilChanged" class="headerlink" title="DistinctUntilChanged"></a>DistinctUntilChanged</h2><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//该操作符用于过滤掉连续重复的事件。</span></span><br><span class="line"><span class="type">Observable</span>.of(<span class="number">2</span>,<span class="number">2</span>, <span class="number">30</span>,<span class="number">2</span>, <span class="number">22</span>, <span class="number">5</span>, <span class="number">60</span>, <span class="number">3</span>, <span class="number">40</span> ,<span class="number">9</span>)</span><br><span class="line">            .distinctUntilChanged()</span><br><span class="line">            .subscribe(onNext: &#123; <span class="built_in">print</span>($<span class="number">0</span>) &#125;)</span><br><span class="line">            .disposed(by: disposedB)</span><br></pre></td></tr></table></figure>
+<h2 id="Single"><a href="#Single" class="headerlink" title="Single"></a>Single</h2><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//限制只发送一次事件，或者满足条件的第一个事件。</span></span><br><span class="line"><span class="comment">//如果存在有多个事件或者没有事件都会发出一个 error 事件。</span></span><br><span class="line"><span class="comment">//如果只有一个事件，则不会发出 error事件。</span></span><br><span class="line"><span class="type">Observable</span>.of(<span class="number">2</span>, <span class="number">30</span>, <span class="number">22</span>, <span class="number">5</span>, <span class="number">60</span>, <span class="number">3</span>, <span class="number">40</span> ,<span class="number">9</span>)</span><br><span class="line">            .single&#123;</span><br><span class="line">                $<span class="number">0</span> == <span class="number">9</span></span><br><span class="line">            &#125;</span><br><span class="line">            .subscribe(onNext: &#123; <span class="built_in">print</span>($<span class="number">0</span>) &#125;)</span><br><span class="line">            .disposed(by: disposedB)$<span class="number">0</span>) &#125;)</span><br><span class="line">            .disposed(by: disposedB)</span><br></pre></td></tr></table></figure>
+<h2 id="ElementAt"><a href="#ElementAt" class="headerlink" title="ElementAt"></a>ElementAt</h2><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//该方法实现仅发送 Observable 序列中的第 n 个事件，在发送之后会自动 .completed。</span></span><br><span class="line"><span class="type">Observable</span>.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>)</span><br><span class="line">            .elementAt(<span class="number">2</span>)</span><br><span class="line">            .subscribe(onNext: &#123; <span class="built_in">print</span>($<span class="number">0</span>) &#125;)</span><br><span class="line">            .disposed(by: disposedB)</span><br></pre></td></tr></table></figure>
+<h2 id="ignoreElements"><a href="#ignoreElements" class="headerlink" title="ignoreElements"></a>ignoreElements</h2><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//该操作符可以忽略掉所有的元素，只发出 error或completed 事件。</span></span><br><span class="line"><span class="comment">//如果我们并不关心 Observable 的任何元素，只想知道 Observable 在什么时候终止，那就可以使用 ignoreElements 操作符。</span></span><br><span class="line"><span class="type">Observable</span>.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>)</span><br><span class="line">            .ignoreElements()</span><br><span class="line">            .subscribe&#123;</span><br><span class="line">                <span class="built_in">print</span>($<span class="number">0</span>)</span><br><span class="line">            &#125;</span><br><span class="line">            .disposed(by: disposedB)</span><br></pre></td></tr></table></figure>
+<h2 id="take"><a href="#take" class="headerlink" title="take"></a>take</h2><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//该方法实现仅发送 Observable 序列中的前 n 个事件，在满足数量之后会自动 .completed。</span></span><br><span class="line"><span class="type">Observable</span>.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>)</span><br><span class="line">            .take(<span class="number">2</span>)</span><br><span class="line">            .subscribe(onNext: &#123; <span class="built_in">print</span>($<span class="number">0</span>) &#125;)</span><br><span class="line">            .disposed(by: disposedB)</span><br></pre></td></tr></table></figure>
+<h2 id="takeLast"><a href="#takeLast" class="headerlink" title="takeLast"></a>takeLast</h2><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//该方法实现仅发送 Observable 序列中的后 n 个事件，在满足数量之后会自动 .completed。</span></span><br><span class="line"><span class="type">Observable</span>.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>)</span><br><span class="line">            .takeLast(<span class="number">1</span>)</span><br><span class="line">            .subscribe(onNext: &#123; <span class="built_in">print</span>($<span class="number">0</span>) &#125;)</span><br><span class="line">            .disposed(by: disposedB)</span><br></pre></td></tr></table></figure>
+<h2 id="skip"><a href="#skip" class="headerlink" title="skip"></a>skip</h2><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//该方法实现仅跳过序列中的前 n 个事件，发送之后 Observable时间</span></span><br><span class="line"><span class="type">Observable</span>.of(<span class="number">2</span>, <span class="number">4</span>, <span class="number">1</span>, <span class="number">4</span>)</span><br><span class="line">            .skip(<span class="number">1</span>)</span><br><span class="line">            .subscribe(onNext: &#123; <span class="built_in">print</span>($<span class="number">0</span>) &#125;)</span><br><span class="line">            .disposed(by: disposedB)</span><br></pre></td></tr></table></figure>
+<h2 id="skip-1"><a href="#skip-1" class="headerlink" title="skip"></a>skip</h2><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//该方法实现仅在notifier接收消息时，source才会接收消息</span></span><br><span class="line">        <span class="keyword">let</span> source = <span class="type">PublishSubject</span>&lt;<span class="type">Int</span>&gt;()</span><br><span class="line">        <span class="keyword">let</span> notifier = <span class="type">PublishSubject</span>&lt;<span class="type">String</span>&gt;()</span><br><span class="line">        source.sample(notifier)</span><br><span class="line">            .subscribe(onNext: &#123; <span class="built_in">print</span>($<span class="number">0</span>) &#125;)</span><br><span class="line">            .disposed(by: disposedB)</span><br><span class="line">        source.onNext(<span class="number">1</span>)</span><br><span class="line">        <span class="comment">//让源序列接收接收消息</span></span><br><span class="line">        notifier.onNext(<span class="string">"A"</span>)</span><br><span class="line">        source.onNext(<span class="number">2</span>)</span><br><span class="line">        source.onNext(<span class="number">3</span>)</span><br><span class="line">        source.onNext(<span class="number">4</span>)</span><br><span class="line">        <span class="comment">//让源序列接收接收消息</span></span><br><span class="line">        notifier.onNext(<span class="string">"B"</span>)</span><br><span class="line">        notifier.onNext(<span class="string">"C"</span>)</span><br><span class="line">        notifier.onNext(<span class="string">"D"</span>)</span><br><span class="line">        source.onNext(<span class="number">3</span>)</span><br><span class="line">        source.onNext(<span class="number">4</span>)</span><br><span class="line">        <span class="comment">//让源序列接收接收消息</span></span><br><span class="line">        notifier.onNext(<span class="string">"D"</span>)</span><br><span class="line">        source.onNext(<span class="number">5</span>)</span><br><span class="line">        <span class="comment">//让源序列接收接收消息</span></span><br><span class="line">        notifier.onNext(<span class="string">"D"</span>)</span><br><span class="line">        notifier.onCompleted()</span><br></pre></td></tr></table></figure>
+<h2 id="Debounce"><a href="#Debounce" class="headerlink" title="Debounce"></a>Debounce</h2><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//debounce 操作符可以用来过滤掉高频产生的元素，它只会发出这种元素：该元素产生后，一段时间内没有新元素产生。</span></span><br><span class="line"><span class="comment">//换句话说就是，队列中的元素如果和下一个元素的间隔小于了指定的时间间隔，那么这个元素将被过滤掉。</span></span><br><span class="line"><span class="comment">//debounce 常用在用户输入的时候，不需要每个字母敲进去都发送一个事件，而是稍等一下取最后一个事件。</span></span><br><span class="line"><span class="comment">//定义好每个事件里的值以及发送的时间</span></span><br><span class="line"><span class="keyword">let</span> times = [	[ <span class="string">"value"</span>: <span class="number">1</span>, <span class="string">"time"</span>: <span class="number">0.1</span> ],</span><br><span class="line">		[ <span class="string">"value"</span>: <span class="number">2</span>, <span class="string">"time"</span>: <span class="number">0.7</span> ],</span><br><span class="line">		[ <span class="string">"value"</span>: <span class="number">3</span>, <span class="string">"time"</span>: <span class="number">1.3</span> ],</span><br><span class="line">		[ <span class="string">"value"</span>: <span class="number">4</span>, <span class="string">"time"</span>: <span class="number">1.3</span> ],</span><br><span class="line">		[ <span class="string">"value"</span>: <span class="number">5</span>, <span class="string">"time"</span>: <span class="number">1.4</span> ],</span><br><span class="line">		[ <span class="string">"value"</span>: <span class="number">6</span>, <span class="string">"time"</span>: <span class="number">2.1</span> ] ]</span><br><span class="line"><span class="comment">//生成对应的 Observable 序列并订阅</span></span><br><span class="line"><span class="type">Observable</span>.from(times)</span><br><span class="line">            .flatMap &#123; item <span class="keyword">in</span></span><br><span class="line">                <span class="keyword">return</span> <span class="type">Observable</span>.of(<span class="type">Int</span>(item[<span class="string">"value"</span>]!))</span><br><span class="line">                    .delaySubscription(<span class="type">Double</span>(item[<span class="string">"time"</span>]!), scheduler: <span class="type">MainScheduler</span>.instance)</span><br><span class="line">            &#125;</span><br><span class="line">            .debounce(<span class="number">0.5</span>, scheduler: <span class="type">MainScheduler</span>.instance) <span class="comment">//只发出与下一个间隔超过0.5秒的元素</span></span><br><span class="line">            .subscribe(onNext: &#123; <span class="built_in">print</span>($<span class="number">0</span>) &#125;)</span><br><span class="line">            .disposed(by: disposedB)</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+    <div>
+  
+    <div>
+
+    <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+  
+    </div>
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/swift/" rel="tag"><i class="fa fa-tag"></i> swift</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/26/iOS逆向/" rel="next" title="iOS app安全加固">
+                <i class="fa fa-chevron-left"></i> iOS app安全加固
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/06/iOS-App启动时间优化/" rel="prev" title="iOS App启动流程">
+                iOS App启动流程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2018/07/28/rxSwift中信号的区别/"
+           data-title="RxSwift中的信号和变化符" data-url="https://www.chuqingr.cn/2018/07/28/rxSwift中信号的区别/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Yshao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/chuqingr" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#信号"><span class="nav-number">2.</span> <span class="nav-text">信号</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Variable"><span class="nav-number">2.1.</span> <span class="nav-text">Variable</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PublishSuject"><span class="nav-number">2.2.</span> <span class="nav-text">PublishSuject</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Subject-订阅者也是observable"><span class="nav-number">2.2.1.</span> <span class="nav-text">Subject 订阅者也是observable</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BehaviorSubject"><span class="nav-number">2.3.</span> <span class="nav-text">BehaviorSubject</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ReplaySubject"><span class="nav-number">2.4.</span> <span class="nav-text">ReplaySubject</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#区别"><span class="nav-number">2.5.</span> <span class="nav-text">区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义的观察者序列（信号）"><span class="nav-number">2.6.</span> <span class="nav-text">自定义的观察者序列（信号）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#通过指定的方法实现来自定义一个被观察的序列。"><span class="nav-number">2.6.1.</span> <span class="nav-text">通过指定的方法实现来自定义一个被观察的序列。</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#变化符"><span class="nav-number">3.</span> <span class="nav-text">变化符</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Filter"><span class="nav-number">3.1.</span> <span class="nav-text">Filter</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DistinctUntilChanged"><span class="nav-number">3.2.</span> <span class="nav-text">DistinctUntilChanged</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Single"><span class="nav-number">3.3.</span> <span class="nav-text">Single</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ElementAt"><span class="nav-number">3.4.</span> <span class="nav-text">ElementAt</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ignoreElements"><span class="nav-number">3.5.</span> <span class="nav-text">ignoreElements</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#take"><span class="nav-number">3.6.</span> <span class="nav-text">take</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#takeLast"><span class="nav-number">3.7.</span> <span class="nav-text">takeLast</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#skip"><span class="nav-number">3.8.</span> <span class="nav-text">skip</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#skip-1"><span class="nav-number">3.9.</span> <span class="nav-text">skip</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Debounce"><span class="nav-number">3.10.</span> <span class="nav-text">Debounce</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yshao</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

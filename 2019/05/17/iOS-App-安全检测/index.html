@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/head.jpg?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="为什么要进行安全检测？在2015年9月份时,在 AppStore 上，有很多 APP 被注入了第三方恶意代码，针对这个问题，盘古实验室紧急开发了病毒检测工具，并检测到大量的受感染的样本。这个事件大家比较熟悉，我不多做描述，有兴趣可以去自己搜索一下。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS App 安全检测">
+<meta property="og:url" content="https://www.chuqingr.cn/2019/05/17/iOS-App-安全检测/index.html">
+<meta property="og:site_name" content="Yshao的个人博客">
+<meta property="og:description" content="为什么要进行安全检测？在2015年9月份时,在 AppStore 上，有很多 APP 被注入了第三方恶意代码，针对这个问题，盘古实验室紧急开发了病毒检测工具，并检测到大量的受感染的样本。这个事件大家比较熟悉，我不多做描述，有兴趣可以去自己搜索一下。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-05-17T06:25:19.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS App 安全检测">
+<meta name="twitter:description" content="为什么要进行安全检测？在2015年9月份时,在 AppStore 上，有很多 APP 被注入了第三方恶意代码，针对这个问题，盘古实验室紧急开发了病毒检测工具，并检测到大量的受感染的样本。这个事件大家比较熟悉，我不多做描述，有兴趣可以去自己搜索一下。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.chuqingr.cn/2019/05/17/iOS-App-安全检测/"/>
+
+
+
+
+
+  <title>iOS App 安全检测 | Yshao的个人博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+    <a href="https://github.com/chuqingr" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#64CEAA; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yshao的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">学海无涯苦作舟</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.chuqingr.cn/2019/05/17/iOS-App-安全检测/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yshao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yshao的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS App 安全检测</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-17T13:51:01+08:00">
+                2019-05-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/05/17/iOS-App-安全检测/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/05/17/iOS-App-安全检测/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="为什么要进行安全检测？"><a href="#为什么要进行安全检测？" class="headerlink" title="为什么要进行安全检测？"></a>为什么要进行安全检测？</h2><p>在2015年9月份时,在 AppStore 上，有很多 APP 被注入了第三方恶意代码，针对这个问题，盘古实验室紧急开发了病毒检测工具，并检测到大量的受感染的样本。这个事件大家比较熟悉，我不多做描述，有兴趣可以去自己搜索一下。</p>
+<a id="more"></a>
+<p>我们通过这个问题考虑为什么进行 iOS APP 检测？使用 iOS 的大部分用户或者 只做app开发的人认为，使用 iphone 从 AppStore 下载一个应用是绝对安全的。事实上并不是这样的，除了 ZipperDown 之外还有一些问题没有被发出来。有些APP还会收集大家的隐私和通讯录等等，所以 AppStore 下载的应用并不绝对是安全的。</p>
+<p>大部分 iOS 开发人员，认为安全相关的内容与自己无关，依赖却并不是完全了解苹果的安全机制，这是在开发中很常见的，因为赶进度或者产品经理奇怪的需求，开发人员会有意无意破坏苹果提供的安全机制，导致他开发出来的 APP 并不安全。</p>
+<p>iOS 平台检测更依赖于经验，Android 有很多自动化检测工具，检测 Android APP 时大家会使用自动化工具做出一个报表，然后看看有什么需要人工去分析的地方再去深入分析。 iOS 不一样，市面上用的自动化检测工具非常简单，检测出来的报告没什么意义。做 iOS 的 APP 检测时需要做人工检测，更多工作内容依赖人工，而人工检测又非常依赖经验。</p>
+<p>iOS平台检测的工具有很多，每个都有自己特定的作用。大概了解下检测的基本结构，首先，拿到一个APP需要先做静态分析，之后根据静态分析出来的结果做一些简单的动态分析，动态分析主要就是抓包，看看有没有什么危险的包，这是明显一眼就可以看出来的问题。其次，根据检测出来的结果和静态分析的代码，看看比较容易出问题的代码是否用到。大家去市面找到iOS 教学或书籍，可以详细的大家告诉有哪些静态工具、动态工具。可是它们没有被整合在一起、很零散，做 iOS 立项或者检测时需要大量时间熟悉我们用的工具。</p>
+<p>这里是给大家总结一下我们做这么长时间 iOS APP 检测的常见问题：</p>
+<ul>
+<li>1.不安全的随机函数。</li>
+<li>2.APP 切换到后台的时候会暴露敏感信息，比如你的手机 APP 在跟别人聊天，你按home会切到后台，它会进行截屏。当然，如果不是越狱的手机，基本是没有风险的。 </li>
+<li>3.存在本地数据库的 SQL 注入。</li>
+<li>4.自动使用第三方键盘输入敏感信息，第三方键盘上传东西的话，可能敏感的信息会被上传到服务器。</li>
+<li>5.没有正确的使用SSL。</li>
+<li>6.未能正确的处理所有的 urlscheme 接口，没有详细过滤。</li>
+<li>7.其他问题。这些都是常见的小问题，一般这种问题在开发者或者在厂商看来都不是什麽大问题。</li>
+</ul>
+<h2 id="接下来看一看一般的开发商比较重视的问题"><a href="#接下来看一看一般的开发商比较重视的问题" class="headerlink" title="接下来看一看一般的开发商比较重视的问题"></a>接下来看一看一般的开发商比较重视的问题</h2><blockquote>
+<ul>
+<li>1.短信验证未作限制。</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>登入或注册时未对获取短信验证码的次数作限制或限制的不够严谨。这个问题的检测方法是通过抓包，去请求验证码的请求包，看看这个验证码会不会重新发送。做得最差的是没有任何前提，可以向服务器请求，服务器可能会发几十条几百条，有的服务器会做一天十条或者一天二十条的限制，或者一段时间内频繁发，服务器会进行阻塞，过一段时间再让你发。开发者在做检测时一定要要严谨，我遇到一个做了检测的方案，他根据 cookie 和一堆乱七八糟的ID做检测，我们通过抓包之后把所有的ID都删完，然后它又可以通过了请求并下发短信，它的服务器代码分支里没有考虑到所有的 ID 都没有的情况，所以没有做限制。这个问题最主要的问题是直接的经济损失，虽然一条短信只有几分钱，但是几分钱也是钱。</p>
+</blockquote>
+<p>-</p>
+<blockquote>
+<ul>
+<li>2.非 HTTPS 网络请求。</li>
+</ul>
+<p>在访问资源时没有通过 HTTPS 做网络请求，检测方法是打开 APP 通过撞户的方法(与撞库原理相同)去看是不是有不是 http 的请求。这个检测方法也非常简单，就是打开 APP ，登录帐号，去看是否有不是 http 的请求是不是在获取敏感信息，比如拉出资源包或者 txt 脚本。我见过最夸张的是整个 APP 里面全部是 http 的网站，它里面包括支付、登录，所有东西全在 http 里，这是非常容易出问题的。这裡多提一句，我们检测国外 APP 时，在美国的 AppStore 上也检测了很多APP，这个问题从来没被发现过，但国内的 APP 中这个问题一抓一大把，所以国内在 https 的使用上有待加强。在恶意的网路环境中，资源文件会被替换，主要攻击就是从这里开始的，这是主要的入口。</p>
+</blockquote>
+<p>-</p>
+<blockquote>
+<ul>
+<li>3.敏感信息储存在本地。</li>
+</ul>
+<p>将敏感的信息，例如帐号、密码或者 加密 使用的密钥 保存在本地。最直接的检测方法是通过静态分析，看看有没有敏感的信息。当然它的影响是针对越狱手机的，但是你把用户的信息存在本地，如果手机丢了或者别人拿到你手机帮你越狱了，或者你的手机被别人越狱了，我就知道你 APP 里面存在的敏感信息是什么，这是其一。其二，密钥保存在本地，APP 的用户有几十万，它的密钥都是这个，我自己越狱装一个 APP，把这个密钥提取出来，在非越狱的手机上通过 http 传输的数据是通过密钥加密的，这样就同样可以替换资源文件了。</p>
+</blockquote>
+<p>-</p>
+<blockquote>
+<ul>
+<li>2.服务器直接信任客户端的请求。</li>
+</ul>
+<p>这个问题比较常见，最常见的就是在做一款游戏时，客户端发过来的请求，服务器并不做验证，服务器直接信任客户端。 《吃鸡》这种游戏是没有办法的，但同时一些卡牌手游也会有这种问题，比如游戏功能完全信赖客户端的游戏，客户端告诉它”我是完全安全的”，这样会导致 App 厂商的损失。我遇到过一款国外的 APP，它把本地保存的图片同步到服务器上，而这张图片是做脸部识别的，只要我拿到别人的手机，把它越狱，这个 APP 再次打开时会把我修改过的照片上传到伺服器。数据库里的照片就被换成了我的照片，我拿那个 APP 照我的脸就可以登录别人的帐号，这个影响比较大。这个排查起来比较简单，主要是通过原始码的开发软件，检查一下客户端发出来的请求，服务器是不是完全信任的。这个问题虽然很简单，但影响很大。</p>
+</blockquote>
+<p>-</p>
+<h2 id="总结与思考"><a href="#总结与思考" class="headerlink" title="总结与思考"></a>总结与思考</h2><p>可看见实际情况与开发人员的猜测存在一定的出入，结合我自身的开发经验，思考我自己开发的项目中存在过的安全问题，发现做安全和做开发时，开发人员并不知道安全人员在想什么。这叫”达克效应”，是一种认知的偏差，在某一方面的能力欠缺时错误的认为自己比真实情况更加优秀，认为只要做了 zip 加密就可以保护 APP 安全了。但在 ZipperDown 和论坛中反映了，hotpatch 相关代码的处理是完全没有问题的，但是其他开发人员在 APP 中下载一堆zip包，且未使用 https 传输会导致问题，这对软件开发和安全攻防中客观存在的情况，是一个比较贴切的解释和总结。</p>
+<p>话说回来，开发人员的主要工作是开发软件，业务压力很大，精力有限。我作为开发人员，经验让我明白在安全问题上犯下错误是难免的，所以开发人员可以多上论坛了解安全知识，减少程序及设计上的安全问题。一些非常隐蔽的小问题，开发人员觉得不是问题的，但其是可以被利用的，这就需要专业安全团队帮助开发人员去检测了。</p>
+
+      
+    </div>
+    
+    
+    
+    <div>
+  
+    <div>
+
+    <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+  
+    </div>
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/04/iOS-命令速查表/" rel="next" title="iOS 命令速查表">
+                <i class="fa fa-chevron-left"></i> iOS 命令速查表
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/07/18/WhatsApp-分析/" rel="prev" title="WhatsApp 分析">
+                WhatsApp 分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2019/05/17/iOS-App-安全检测/"
+           data-title="iOS App 安全检测" data-url="https://www.chuqingr.cn/2019/05/17/iOS-App-安全检测/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Yshao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/chuqingr" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么要进行安全检测？"><span class="nav-number">1.</span> <span class="nav-text">为什么要进行安全检测？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接下来看一看一般的开发商比较重视的问题"><span class="nav-number">2.</span> <span class="nav-text">接下来看一看一般的开发商比较重视的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结与思考"><span class="nav-number">3.</span> <span class="nav-text">总结与思考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yshao</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
