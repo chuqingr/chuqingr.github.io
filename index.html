@@ -329,54 +329,16 @@
 
       
         
-          
-            <h2 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h2><ul>
-<li><p>1.首先 终端需要翻墙</p>
-</li>
-<li><p>2.下载 chromium 提供的工具，<a href="https://chromium.googlesource.com/chromium/tools/depot_tools" target="_blank" rel="noopener">depot_tools</a></p>
-<blockquote>
-<p>git clone <a href="https://chromium.googlesource.com/chromium/tools/depot_tools.git" target="_blank" rel="noopener">https://chromium.googlesource.com/chromium/tools/depot_tools.git</a>  </p>
-</blockquote>
-</li>
-<li><p>3.将 depot_tools 的目录添加到环境变量</p>
-<blockquote>
-<p>export PATH=“$PATH:_path_depot_tools”  | path 为depot_tools文件的路径  </p>
-</blockquote>
-</li>
-<li><p>4.新建一个 文件夹 &amp; 打开文件夹</p>
-<blockquote>
-<p>$ mkdir chromium &amp;&amp; cd chromium  </p>
-</blockquote>
-</li>
-<li><p>5.开始下载</p>
-<blockquote>
-<p>$ fetch –no-history  chromium   |  –no-history 的意思是不下载历史版本的信息  </p>
-</blockquote>
-</li>
-<li><p>6.等待下载完成，（10M的速度大概需要20分钟左右能下载完成）</p>
-</li>
+          <h2 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h2><ul>
+<li>1.首先 终端需要翻墙</li>
 </ul>
-<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><h3 id="现在chromium-使用-GN-来编译构建"><a href="#现在chromium-使用-GN-来编译构建" class="headerlink" title="现在chromium 使用 GN 来编译构建"></a>现在chromium 使用 GN 来编译构建</h3><ul>
-<li><p>1.进入 src 目录，输入</p>
-<blockquote>
-<p>gn gen out/default   |  gen 命令会根据当前的 目录下的 .gn  以及指向的BUILDCONFIG.gn &amp;&amp; BUILD.gn 等文件 ，生成对应的 .ninja 文件，真正进行编译的 是 .ninja 文件  </p>
-</blockquote>
-</li>
-<li><p>2.执行</p>
-<blockquote>
-<p>ninja -C out/defalut 命令，就会开始漫长的编译过程，根据机器性能，编译过程大概在 5 - 10 小时不等。大约要编译4w+的文件.  </p>
-</blockquote>
-</li>
-</ul>
-<h2 id="a-的集成"><a href="#a-的集成" class="headerlink" title=".a 的集成"></a>.a 的集成</h2><p>由于 Chromium 版本项目过大，编译花费时间过长，目前没有 测试成功是否 能正确 集成，记录下几个可能的猜想点</p>
-<h3 id="基本确定的："><a href="#基本确定的：" class="headerlink" title="基本确定的："></a>基本确定的：</h3><ul>
-<li>1.libs 字段 用来引入第三方 library  &amp;&amp; lib_dirs 字段 用来指定 libs 的目录路径</li>
-</ul>
-<blockquote>
-<p><strong>libs</strong>: Additional libraries to link.  <strong>lib_dirs</strong>: Additional library directories.  </p>
-</blockquote>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2019/12/24/Mac-Chromium-下载-编译-以及-a-集成/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
