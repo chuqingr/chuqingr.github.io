@@ -79,13 +79,17 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="Yshao的个人博客">
-<meta property="og:url" content="https://www.chuqingr.cn/archives/2018/index.html">
+<meta name="description" content="下载 1.首先 终端需要翻墙  2.下载 chromium 提供的工具，depot_tools  git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git     3.将 depot_tools 的目录添加到环境变量  export PATH=“$PATH:_path_depot_tools”  | pat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mac Chromium 下载 &amp; 编译 以及.a 集成">
+<meta property="og:url" content="https://www.chuqingr.cn/2019/12/24/Mac-Chromium-下载-编译-以及-a-集成/index.html">
 <meta property="og:site_name" content="Yshao的个人博客">
+<meta property="og:description" content="下载 1.首先 终端需要翻墙  2.下载 chromium 提供的工具，depot_tools  git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git     3.将 depot_tools 的目录添加到环境变量  export PATH=“$PATH:_path_depot_tools”  | pat">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-12-24T08:29:28.862Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Yshao的个人博客">
+<meta name="twitter:title" content="Mac Chromium 下载 &amp; 编译 以及.a 集成">
+<meta name="twitter:description" content="下载 1.首先 终端需要翻墙  2.下载 chromium 提供的工具，depot_tools  git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git     3.将 depot_tools 的目录添加到环境变量  export PATH=“$PATH:_path_depot_tools”  | pat">
 
 
 
@@ -115,13 +119,13 @@
 
 
 
-  <link rel="canonical" href="https://www.chuqingr.cn/archives/2018/"/>
+  <link rel="canonical" href="https://www.chuqingr.cn/2019/12/24/Mac-Chromium-下载-编译-以及-a-集成/"/>
 
 
 
 
 
-  <title>归档 | Yshao的个人博客</title>
+  <title>Mac Chromium 下载 & 编译 以及.a 集成 | Yshao的个人博客</title>
   
 
 
@@ -140,7 +144,7 @@
     
   
 
-  <div class="container sidebar-position-left page-archive">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
     <a href="https://github.com/chuqingr" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#64CEAA; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -234,411 +238,205 @@
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block archive">
-    <div id="posts" class="posts-collapse">
-      <span class="archive-move-on"></span>
+  <div id="posts" class="posts-expand">
+    
 
-      <span class="archive-page-counter">
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.chuqingr.cn/2019/12/24/Mac-Chromium-下载-编译-以及-a-集成/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yshao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yshao的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
         
         
+          <h1 class="post-title" itemprop="name headline">Mac Chromium 下载 & 编译 以及.a 集成</h1>
         
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-24T16:28:12+08:00">
+                2019-12-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
           
-        
-        嗯..! 目前共计 23 篇日志。 继续努力。
-      </span>
 
-      
-
-        
-        
-        
-
-        
           
-          <div class="collection-title">
-            <h1 class="archive-year" id="archive-year-2018">2018</h1>
-          </div>
-        
-        
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/12/24/Mac-Chromium-下载-编译-以及-a-集成/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/12/24/Mac-Chromium-下载-编译-以及-a-集成/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
 
-        
+          
+          
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+          
 
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/11/09/如何正确的-hook-AppDelegate-中的方法/" itemprop="url">
-              
-                <span itemprop="name">如何正确的 hook AppDelegate 中的方法</span>
-              
-            </a>
-        
-      </h2>
+          
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-11-09T11:28:59+08:00"
-              content="2018-11-09" >
-          11-09
-        </time>
-      </div>
+          
 
-    </header>
-  </article>
+        </div>
+      </header>
+    
 
-
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/10/30/CTMediator-组件化实践/" itemprop="url">
-              
-                <span itemprop="name">CTMediator 组件化实践</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-10-30T11:42:48+08:00"
-              content="2018-10-30" >
-          10-30
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
       
 
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/08/30/MVVM-rxSwift中VM设计方式的探究/" itemprop="url">
-              
-                <span itemprop="name">MVVM & RxSwift 中 VM 设计方式的探究</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-08-30T17:10:27+08:00"
-              content="2018-08-30" >
-          08-30
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
+      
+        <h2 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h2><ul>
+<li><p>1.首先 终端需要翻墙</p>
+</li>
+<li><p>2.下载 chromium 提供的工具，<a href="https://chromium.googlesource.com/chromium/tools/depot_tools" target="_blank" rel="noopener">depot_tools</a></p>
+<blockquote>
+<p>git clone <a href="https://chromium.googlesource.com/chromium/tools/depot_tools.git" target="_blank" rel="noopener">https://chromium.googlesource.com/chromium/tools/depot_tools.git</a>  </p>
+</blockquote>
+</li>
+<li><p>3.将 depot_tools 的目录添加到环境变量</p>
+<blockquote>
+<p>export PATH=“$PATH:_path_depot_tools”  | path 为depot_tools文件的路径  </p>
+</blockquote>
+</li>
+<li><p>4.新建一个 文件夹 &amp; 打开文件夹</p>
+<blockquote>
+<p>$ mkdir chromium &amp;&amp; cd chromium  </p>
+</blockquote>
+</li>
+<li><p>5.开始下载</p>
+<blockquote>
+<p>$ fetch –no-history  chromium   |  –no-history 的意思是不下载历史版本的信息  </p>
+</blockquote>
+</li>
+<li><p>6.等待下载完成，（10M的速度大概需要20分钟左右能下载完成）</p>
+</li>
+</ul>
+<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><h3 id="现在chromium-使用-GN-来编译构建"><a href="#现在chromium-使用-GN-来编译构建" class="headerlink" title="现在chromium 使用 GN 来编译构建"></a>现在chromium 使用 GN 来编译构建</h3><ul>
+<li><p>1.进入 src 目录，输入</p>
+<blockquote>
+<p>gn gen out/default   |  gen 命令会根据当前的 目录下的 .gn  以及指向的BUILDCONFIG.gn &amp;&amp; BUILD.gn 等文件 ，生成对应的 .ninja 文件，真正进行编译的 是 .ninja 文件  </p>
+</blockquote>
+</li>
+<li><p>2.执行</p>
+<blockquote>
+<p>ninja -C out/defalut 命令，就会开始漫长的编译过程，根据机器性能，编译过程大概在 5 - 10 小时不等。大约要编译4w+的文件.  </p>
+</blockquote>
+</li>
+</ul>
+<h2 id="a-的集成"><a href="#a-的集成" class="headerlink" title=".a 的集成"></a>.a 的集成</h2><p>由于 Chromium 版本项目过大，编译花费时间过长，目前没有 测试成功是否 能正确 集成，记录下几个可能的猜想点</p>
+<h3 id="基本确定的："><a href="#基本确定的：" class="headerlink" title="基本确定的："></a>基本确定的：</h3><ul>
+<li>1.libs 字段 用来引入第三方 library  &amp;&amp; lib_dirs 字段 用来指定 libs 的目录路径</li>
+</ul>
+<blockquote>
+<p><strong>libs</strong>: Additional libraries to link.  <strong>lib_dirs</strong>: Additional library directories.  </p>
+</blockquote>
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/08/29/iOS-项目结构/" itemprop="url">
-              
-                <span itemprop="name">iOS 项目结构与代码规范</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-08-29T09:23:36+08:00"
-              content="2018-08-29" >
-          08-29
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/08/28/iOS项目架构的选择/" itemprop="url">
-              
-                <span itemprop="name">iOS项目架构的选择</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-08-28T08:56:42+08:00"
-              content="2018-08-28" >
-          08-28
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/08/22/iOS-多线程GCD封装/" itemprop="url">
-              
-                <span itemprop="name">iOS 多线程GCD封装</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-08-22T10:02:12+08:00"
-              content="2018-08-22" >
-          08-22
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/08/06/iOS-App启动时间优化/" itemprop="url">
-              
-                <span itemprop="name">iOS App启动流程</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-08-06T09:51:36+08:00"
-              content="2018-08-06" >
-          08-06
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/07/28/rxSwift中信号的区别/" itemprop="url">
-              
-                <span itemprop="name">RxSwift中的信号和变化符</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-07-28T11:25:58+08:00"
-              content="2018-07-28" >
-          07-28
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/07/26/iOS逆向/" itemprop="url">
-              
-                <span itemprop="name">iOS app安全加固</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-07-26T09:08:32+08:00"
-              content="2018-07-26" >
-          07-26
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/07/20/fastlane/" itemprop="url">
-              
-                <span itemprop="name">fastlane自动化打包&自动上传pgyer&钉钉机器人自动发布</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-07-20T15:02:41+08:00"
-              content="2018-07-20" >
-          07-20
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
     </div>
+    
+    
+    
+    <div>
+  
+    <div>
+
+    <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+  
+    </div>
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/17/LeetCode/" rel="next" title="LeetCode">
+                <i class="fa fa-chevron-left"></i> LeetCode
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
-
-  
-  <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/archives/2018/page/2/">2</a><a class="extend next" rel="next" href="/archives/2018/page/2/"><i class="fa fa-angle-right"></i></a>
-  </nav>
+  </article>
 
 
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -646,6 +444,17 @@
 
 
           
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2019/12/24/Mac-Chromium-下载-编译-以及-a-集成/"
+           data-title="Mac Chromium 下载 & 编译 以及.a 集成" data-url="https://www.chuqingr.cn/2019/12/24/Mac-Chromium-下载-编译-以及-a-集成/">
+      </div>
+    </div>
+
+  
+
+
 
         </div>
         
@@ -666,8 +475,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -737,6 +555,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#下载"><span class="nav-number">1.</span> <span class="nav-text">下载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译"><span class="nav-number">2.</span> <span class="nav-text">编译</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#现在chromium-使用-GN-来编译构建"><span class="nav-number">2.1.</span> <span class="nav-text">现在chromium 使用 GN 来编译构建</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#a-的集成"><span class="nav-number">3.</span> <span class="nav-text">.a 的集成</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基本确定的："><span class="nav-number">3.1.</span> <span class="nav-text">基本确定的：</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -870,6 +704,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 

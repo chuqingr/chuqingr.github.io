@@ -249,6 +249,183 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.chuqingr.cn/2019/12/24/Mac-Chromium-下载-编译-以及-a-集成/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yshao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yshao的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/12/24/Mac-Chromium-下载-编译-以及-a-集成/" itemprop="url">Mac Chromium 下载 & 编译 以及.a 集成</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-24T16:28:12+08:00">
+                2019-12-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/12/24/Mac-Chromium-下载-编译-以及-a-集成/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/12/24/Mac-Chromium-下载-编译-以及-a-集成/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h2><ul>
+<li><p>1.首先 终端需要翻墙</p>
+</li>
+<li><p>2.下载 chromium 提供的工具，<a href="https://chromium.googlesource.com/chromium/tools/depot_tools" target="_blank" rel="noopener">depot_tools</a></p>
+<blockquote>
+<p>git clone <a href="https://chromium.googlesource.com/chromium/tools/depot_tools.git" target="_blank" rel="noopener">https://chromium.googlesource.com/chromium/tools/depot_tools.git</a>  </p>
+</blockquote>
+</li>
+<li><p>3.将 depot_tools 的目录添加到环境变量</p>
+<blockquote>
+<p>export PATH=“$PATH:_path_depot_tools”  | path 为depot_tools文件的路径  </p>
+</blockquote>
+</li>
+<li><p>4.新建一个 文件夹 &amp; 打开文件夹</p>
+<blockquote>
+<p>$ mkdir chromium &amp;&amp; cd chromium  </p>
+</blockquote>
+</li>
+<li><p>5.开始下载</p>
+<blockquote>
+<p>$ fetch –no-history  chromium   |  –no-history 的意思是不下载历史版本的信息  </p>
+</blockquote>
+</li>
+<li><p>6.等待下载完成，（10M的速度大概需要20分钟左右能下载完成）</p>
+</li>
+</ul>
+<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><h3 id="现在chromium-使用-GN-来编译构建"><a href="#现在chromium-使用-GN-来编译构建" class="headerlink" title="现在chromium 使用 GN 来编译构建"></a>现在chromium 使用 GN 来编译构建</h3><ul>
+<li><p>1.进入 src 目录，输入</p>
+<blockquote>
+<p>gn gen out/default   |  gen 命令会根据当前的 目录下的 .gn  以及指向的BUILDCONFIG.gn &amp;&amp; BUILD.gn 等文件 ，生成对应的 .ninja 文件，真正进行编译的 是 .ninja 文件  </p>
+</blockquote>
+</li>
+<li><p>2.执行</p>
+<blockquote>
+<p>ninja -C out/defalut 命令，就会开始漫长的编译过程，根据机器性能，编译过程大概在 5 - 10 小时不等。大约要编译4w+的文件.  </p>
+</blockquote>
+</li>
+</ul>
+<h2 id="a-的集成"><a href="#a-的集成" class="headerlink" title=".a 的集成"></a>.a 的集成</h2><p>由于 Chromium 版本项目过大，编译花费时间过长，目前没有 测试成功是否 能正确 集成，记录下几个可能的猜想点</p>
+<h3 id="基本确定的："><a href="#基本确定的：" class="headerlink" title="基本确定的："></a>基本确定的：</h3><ul>
+<li>1.libs 字段 用来引入第三方 library  &amp;&amp; lib_dirs 字段 用来指定 libs 的目录路径</li>
+</ul>
+<blockquote>
+<p><strong>libs</strong>: Additional libraries to link.  <strong>lib_dirs</strong>: Additional library directories.  </p>
+</blockquote>
+
+          
+        
+      
+    </div>
+    
+    
+    
+    <div>
+  
+    </div>
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://www.chuqingr.cn/2019/09/17/LeetCode/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1499,167 +1676,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.chuqingr.cn/2018/10/30/CTMediator-组件化实践/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Yshao">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Yshao的个人博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/10/30/CTMediator-组件化实践/" itemprop="url">CTMediator 组件化实践</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-30T11:42:48+08:00">
-                2018-10-30
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/iOS开发/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS开发</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/10/30/CTMediator-组件化实践/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/10/30/CTMediator-组件化实践/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="CTMediator"><a href="#CTMediator" class="headerlink" title="CTMediator"></a>CTMediator</h2><blockquote>
-<p>关于 CTMediator 其实接触已经有一段时间了，只是前段时间一直在忙着换工作，准备面试，还有出去旅游，~~ 所以一直没有写这篇文章。<br> 写这个之前，我已经将上家公司的项目 使用 CTMediator 组件化完成了，也算是对之前的东家有个好的交代，希望发展的越来越好。</p>
-</blockquote>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/10/30/CTMediator-组件化实践/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-    <div>
-  
-    </div>
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1710,7 +1726,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-count">23</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
