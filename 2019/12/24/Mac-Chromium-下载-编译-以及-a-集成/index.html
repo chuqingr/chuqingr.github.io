@@ -86,7 +86,7 @@
 <meta property="og:site_name" content="Yshao的个人博客">
 <meta property="og:description" content="下载 1.首先 终端需要翻墙">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-12-24T12:54:07.195Z">
+<meta property="og:updated_time" content="2019-12-25T02:04:29.094Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Mac Chromium 下载 &amp; 编译 以及.a 集成">
 <meta name="twitter:description" content="下载 1.首先 终端需要翻墙">
@@ -358,12 +358,14 @@
 </li>
 </ul>
 <h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><h3 id="现在chromium-使用-GN-来编译构建"><a href="#现在chromium-使用-GN-来编译构建" class="headerlink" title="现在chromium 使用 GN 来编译构建"></a>现在chromium 使用 GN 来编译构建</h3><ul>
-<li><p>1.进入 src 目录，输入</p>
-<blockquote>
+<li>1.进入 src 目录，输入<blockquote>
 <p>gn gen out/default   |  gen 命令会根据当前的 目录下的 .gn  以及指向的BUILDCONFIG.gn &amp;&amp; BUILD.gn 等文件 ，生成对应的 .ninja 文件，真正进行编译的 是 .ninja 文件  </p>
 </blockquote>
 </li>
-<li><p>2.执行</p>
+<li><p>2.在 default 中，找到 args.gn,并编辑，添加 编译参数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">is_component_build = true</span><br><span class="line">is_debug = false</span><br><span class="line">symbol_level = 0</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>3.执行</p>
 <blockquote>
 <p>ninja -C out/defalut chrom 命令，就会开始漫长的编译过程，根据机器性能，编译过程大概在 5 - 10 小时不等。大约要编译4w+的文件.  </p>
 </blockquote>
